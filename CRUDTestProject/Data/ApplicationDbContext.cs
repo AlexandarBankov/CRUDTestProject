@@ -1,4 +1,4 @@
-﻿using CRUDTestProject.Models.Entities;
+﻿using CRUDTestProject.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace CRUDTestProject.Data

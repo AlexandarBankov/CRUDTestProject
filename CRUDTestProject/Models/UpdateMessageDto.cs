@@ -1,10 +1,8 @@
-﻿namespace CRUDTestProject.Models.Entities
+﻿namespace CRUDTestProject.Models
 {
-    public class Message
+    public class UpdateMessageDto
     {
-        public Guid Id { get; set; }
         public required string Name { get; set; }
         public required string Content { get; set; }
-
     }
 }
