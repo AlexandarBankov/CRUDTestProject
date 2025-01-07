@@ -1,4 +1,4 @@
-﻿namespace CRUDTestProject.Models.Entities
+﻿namespace CRUDTestProject.Models
 {
     public class UpdateMessageDto
     {

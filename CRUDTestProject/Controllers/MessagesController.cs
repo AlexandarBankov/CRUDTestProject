@@ -1,6 +1,6 @@
 ﻿using CRUDTestProject.Data;
+using CRUDTestProject.Data.Entities;
 using CRUDTestProject.Models;
-using CRUDTestProject.Models.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,11 +19,22 @@ namespace CRUDTestProject.Controllers
 
 
         [HttpGet]
-        public IActionResult getAllMessages() 
+        public IActionResult getAllMessagesContaining([FromQuery] string searchString = "", [FromQuery] bool isOrderAscending = true)
         {
-            var allMessages = dbContext.Messages.ToList();
+            var filteredMessages = dbContext.Messages
+                .Where(m => m.Content.Contains(searchString));
+            
+            
+            if (isOrderAscending)
+            {
+                filteredMessages = filteredMessages.OrderBy(m => m.CreationDate);
+            }
+            else
+            {
+                filteredMessages = filteredMessages.OrderByDescending(m => m.CreationDate);
+            }
 
-            return Ok(allMessages);
+            return Ok(filteredMessages.ToList());
         }
 
         [HttpGet]
@@ -46,7 +57,8 @@ namespace CRUDTestProject.Controllers
             var messageEntity = new Message 
             {
                 Name = addMessageDto.Name, 
-                Content = addMessageDto.Content
+                Content = addMessageDto.Content,
+                CreationDate = DateTime.Now
             };
 
             dbContext.Messages.Add(messageEntity);
