@@ -19,11 +19,22 @@ namespace CRUDTestProject.Controllers
 
 
         [HttpGet]
-        public IActionResult getAllMessagesContaining([FromQuery] string searchString) 
+        public IActionResult getAllMessagesContaining([FromQuery] string searchString = "", [FromQuery] bool isOrderAscending = true)
         {
-            var filteredMessages = dbContext.Messages.Where(m => m.Content.Contains(searchString)).ToList();
+            var filteredMessages = dbContext.Messages
+                .Where(m => m.Content.Contains(searchString));
+            
+            
+            if (isOrderAscending)
+            {
+                filteredMessages = filteredMessages.OrderBy(m => m.CreationDate);
+            }
+            else
+            {
+                filteredMessages = filteredMessages.OrderByDescending(m => m.CreationDate);
+            }
 
-            return Ok(filteredMessages);
+            return Ok(filteredMessages.ToList());
         }
 
         [HttpGet]
