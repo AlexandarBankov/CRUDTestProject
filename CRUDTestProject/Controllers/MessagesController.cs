@@ -46,7 +46,8 @@ namespace CRUDTestProject.Controllers
             var messageEntity = new Message 
             {
                 Name = addMessageDto.Name, 
-                Content = addMessageDto.Content
+                Content = addMessageDto.Content,
+                CreationDate = DateTime.Now
             };
 
             dbContext.Messages.Add(messageEntity);
