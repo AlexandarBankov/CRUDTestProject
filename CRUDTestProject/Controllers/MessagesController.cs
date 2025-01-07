@@ -1,6 +1,6 @@
 ﻿using CRUDTestProject.Data;
+using CRUDTestProject.Data.Entities;
 using CRUDTestProject.Models;
-using CRUDTestProject.Models.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,11 +19,11 @@ namespace CRUDTestProject.Controllers
 
 
         [HttpGet]
-        public IActionResult getAllMessages() 
+        public IActionResult getAllMessagesContaining([FromQuery] string searchString) 
         {
-            var allMessages = dbContext.Messages.ToList();
+            var filteredMessages = dbContext.Messages.Where(m => m.Content.Contains(searchString)).ToList();
 
-            return Ok(allMessages);
+            return Ok(filteredMessages);
         }
 
         [HttpGet]
