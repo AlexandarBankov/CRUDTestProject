@@ -8,5 +8,7 @@
 
         public required DateTime CreationDate { get; set; }
 
+        public required virtual User User { get; set; }
+
     }
 }

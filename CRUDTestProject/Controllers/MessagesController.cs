@@ -21,20 +21,15 @@ namespace CRUDTestProject.Controllers
         [HttpGet]
         public IActionResult getAllMessagesContaining([FromQuery] string searchString = "", [FromQuery] bool isOrderAscending = true)
         {
-            var filteredMessages = dbContext.Messages
-                .Where(m => m.Content.Contains(searchString));
+            var orderedMessages = isOrderAscending ?
+                dbContext.Messages.OrderBy(m => m.CreationDate)
+                : dbContext.Messages.OrderByDescending(m => m.CreationDate); 
             
-            
-            if (isOrderAscending)
-            {
-                filteredMessages = filteredMessages.OrderBy(m => m.CreationDate);
-            }
-            else
-            {
-                filteredMessages = filteredMessages.OrderByDescending(m => m.CreationDate);
-            }
+            var result = orderedMessages
+                .Where(m => m.Content.Contains(searchString))
+                .ToList();
 
-            return Ok(filteredMessages.ToList());
+            return Ok(result);
         }
 
         [HttpGet]
@@ -58,7 +53,8 @@ namespace CRUDTestProject.Controllers
             {
                 Name = addMessageDto.Name, 
                 Content = addMessageDto.Content,
-                CreationDate = DateTime.Now
+                CreationDate = DateTime.Now,
+                User = dbContext.Users.First()
             };
 
             dbContext.Messages.Add(messageEntity);
