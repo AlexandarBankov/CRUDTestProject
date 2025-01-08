@@ -25,12 +25,12 @@ namespace CRUDTestProject.Data
 
         public IEnumerable<Message> GetAll()
         {
-            return dbContext.Messages.Include(m => m.User);
+            return dbContext.Messages.Include(m => m.User).AsNoTracking();
         }
 
         public Message? GetById(Guid id)
         {
-            return dbContext.Messages.Include(m => m.User).Where(m => m.Id == id).FirstOrDefault();
+            return dbContext.Messages.Include(m => m.User).Where(m => m.Id == id).AsNoTracking().FirstOrDefault();
         }
 
         public User GetUser()
