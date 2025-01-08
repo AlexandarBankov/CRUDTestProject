@@ -12,14 +12,14 @@ namespace CRUDTestProject.Data
         }
         public void Delete(Guid id)
         {
-            var Message = dbContext.Messages.Find(id);
+            var message = dbContext.Messages.Find(id);
             
-            if (Message is null)
+            if (message is null)
             {
-                throw new ArgumentException();
+                throw new ArgumentNullException();
             }
             
-            dbContext.Messages.Remove(Message);
+            dbContext.Messages.Remove(message);
         }
 
         public IEnumerable<Message> GetAll()
@@ -29,7 +29,7 @@ namespace CRUDTestProject.Data
 
         public Message? GetById(Guid id)
         {
-            return dbContext.Messages.Include(m => m.User).ToList().Find(m => m.Id == id);
+            return dbContext.Messages.Include(m => m.User).Where(m => m.Id == id).FirstOrDefault();
         }
 
         public User GetUser()
@@ -47,17 +47,19 @@ namespace CRUDTestProject.Data
             dbContext.SaveChanges();
         }
 
-        public void Update(Guid id, string name, string content)
+        public Message Update(Guid id, string name, string content)
         {
-            var message = dbContext.Messages.Find(id);
+            var message = dbContext.Messages.Include(m => m.User).Where(m => m.Id == id).FirstOrDefault();
 
             if (message is null)
             {
-                throw new ArgumentException();
+                throw new ArgumentNullException();
             }
 
             message.Name = name;
             message.Content = content;
+
+            return message;
         }
     }
 }

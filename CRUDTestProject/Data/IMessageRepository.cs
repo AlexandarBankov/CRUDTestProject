@@ -9,7 +9,7 @@ namespace CRUDTestProject.Data
         Message? GetById(Guid id);
 
         void Insert(Message message);
-        void Update(Guid id, string name, string content);
+        Message Update(Guid id, string name, string content);
         void Delete(Guid id);
         User GetUser();
         void Save();

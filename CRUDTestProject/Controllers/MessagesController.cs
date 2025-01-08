@@ -1,6 +1,7 @@
 ﻿using CRUDTestProject.Data;
 using CRUDTestProject.Data.Entities;
 using CRUDTestProject.Models;
+using CRUDTestProject.Models.Response;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +29,7 @@ namespace CRUDTestProject.Controllers
             
             var result = orderedMessages
                 .Where(m => m.Content.Contains(searchString))
+                .Select(m => new MessageResponseModel(m))
                 .ToList();
 
             return Ok(result);
@@ -44,7 +46,7 @@ namespace CRUDTestProject.Controllers
                 return NotFound();
             }
 
-            return Ok(message);
+            return Ok(new MessageResponseModel(message));
         }
 
         [HttpPost]
@@ -61,25 +63,26 @@ namespace CRUDTestProject.Controllers
             messageRepository.Insert(messageEntity);
             messageRepository.Save();
             
-            return Ok(messageEntity);
+            return Ok(new MessageResponseModel(messageEntity));
         }
 
         [HttpPut]
         [Route("{id:guid}")]
         public IActionResult UpdateMessage(Guid id, UpdateMessageDto updateMessageDto) 
         {
+            Message message;
             try
             {
-                messageRepository.Update(id, updateMessageDto.Name, updateMessageDto.Content);
+                message = messageRepository.Update(id, updateMessageDto.Name, updateMessageDto.Content);
             }
-            catch (ArgumentException)
+            catch (ArgumentNullException)
             {
                 return NotFound();
             }
             
             messageRepository.Save();
 
-            return Ok(messageRepository.GetById(id));
+            return Ok(new MessageResponseModel(message));
         }
 
         [HttpDelete]
@@ -90,7 +93,7 @@ namespace CRUDTestProject.Controllers
             {
                 messageRepository.Delete(id);
             }
-            catch (ArgumentException)
+            catch (ArgumentNullException)
             {
                 return NotFound();
             }
