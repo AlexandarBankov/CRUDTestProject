@@ -14,9 +14,9 @@ namespace CRUDTestProject.Controllers
     {
         private readonly IMessageRepository messageRepository;
 
-        public MessagesController(ApplicationDbContext dbContext)
+        public MessagesController(IMessageRepository messageRepository)
         {
-            this.messageRepository = new MessageRepository(dbContext);
+            this.messageRepository = messageRepository;
         }
 
 
