@@ -12,6 +12,5 @@ namespace CRUDTestProject.Data
         Message Update(Guid id, string name, string content);
         void Delete(Guid id);
         User GetUser();
-        void Save();
     }
 }

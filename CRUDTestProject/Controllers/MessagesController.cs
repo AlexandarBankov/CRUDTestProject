@@ -61,7 +61,6 @@ namespace CRUDTestProject.Controllers
             };
 
             messageRepository.Insert(messageEntity);
-            messageRepository.Save();
             
             return Ok(new MessageResponseModel(messageEntity));
         }
@@ -79,8 +78,6 @@ namespace CRUDTestProject.Controllers
             {
                 return NotFound();
             }
-            
-            messageRepository.Save();
 
             return Ok(new MessageResponseModel(message));
         }
@@ -97,8 +94,6 @@ namespace CRUDTestProject.Controllers
             {
                 return NotFound();
             }
-
-            messageRepository.Save();
 
             return Ok();
         }

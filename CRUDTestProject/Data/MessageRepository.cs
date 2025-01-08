@@ -20,6 +20,7 @@ namespace CRUDTestProject.Data
             }
             
             dbContext.Messages.Remove(message);
+            dbContext.SaveChanges();
         }
 
         public IEnumerable<Message> GetAll()
@@ -40,10 +41,6 @@ namespace CRUDTestProject.Data
         public void Insert(Message message)
         {
             dbContext.Messages.Add(message);
-        }
-
-        public void Save()
-        {
             dbContext.SaveChanges();
         }
 
@@ -58,6 +55,8 @@ namespace CRUDTestProject.Data
 
             message.Name = name;
             message.Content = content;
+            
+            dbContext.SaveChanges();
 
             return message;
         }
