@@ -11,11 +11,11 @@ namespace CRUDTestProject.Controllers
     [ApiController]
     public class MessagesController : ControllerBase
     {
-        private readonly ApplicationDbContext dbContext;
+        private readonly IMessageRepository messageRepository;
 
         public MessagesController(ApplicationDbContext dbContext)
         {
-            this.dbContext = dbContext;
+            this.messageRepository = new MessageRepository(dbContext);
         }
 
 
@@ -23,11 +23,11 @@ namespace CRUDTestProject.Controllers
         public IActionResult getAllMessagesContaining([FromQuery] string searchString = "", [FromQuery] bool isOrderAscending = true)
         {
             var orderedMessages = isOrderAscending ?
-                dbContext.Messages.OrderBy(m => m.CreationDate)
-                : dbContext.Messages.OrderByDescending(m => m.CreationDate); 
+                messageRepository.GetAll().OrderBy(m => m.CreationDate)
+                : messageRepository.GetAll().OrderByDescending(m => m.CreationDate); 
             
             var result = orderedMessages
-                .Where(m => m.Content.Contains(searchString)).Include(m => m.User)
+                .Where(m => m.Content.Contains(searchString))
                 .ToList();
 
             return Ok(result);
@@ -37,7 +37,7 @@ namespace CRUDTestProject.Controllers
         [Route("{id:guid}")]
         public IActionResult getMessageById(Guid id)
         {
-            var message = dbContext.Messages.Find(id);
+            var message = messageRepository.GetById(id);
 
             if (message is null)
             {
@@ -55,11 +55,11 @@ namespace CRUDTestProject.Controllers
                 Name = addMessageDto.Name, 
                 Content = addMessageDto.Content,
                 CreationDate = DateTime.Now,
-                User = dbContext.Users.First()
+                User = messageRepository.GetUser()
             };
 
-            dbContext.Messages.Add(messageEntity);
-            dbContext.SaveChanges();
+            messageRepository.Insert(messageEntity);
+            messageRepository.Save();
             
             return Ok(messageEntity);
         }
@@ -68,34 +68,34 @@ namespace CRUDTestProject.Controllers
         [Route("{id:guid}")]
         public IActionResult UpdateMessage(Guid id, UpdateMessageDto updateMessageDto) 
         {
-            var message = dbContext.Messages.Find(id);
-
-            if (message is null)
+            try
+            {
+                messageRepository.Update(id, updateMessageDto.Name, updateMessageDto.Content);
+            }
+            catch (ArgumentException)
             {
                 return NotFound();
             }
+            
+            messageRepository.Save();
 
-            message.Name = updateMessageDto.Name;
-            message.Content = updateMessageDto.Content;
-
-            dbContext.SaveChanges();
-
-            return Ok(message);
+            return Ok(messageRepository.GetById(id));
         }
 
         [HttpDelete]
         [Route("{id:guid}")]
         public IActionResult DeleteMessage(Guid id) 
         {
-            var message = dbContext.Messages.Find(id);
-
-            if (message is null)
+            try
+            {
+                messageRepository.Delete(id);
+            }
+            catch (ArgumentException)
             {
                 return NotFound();
             }
 
-            dbContext.Messages.Remove(message);
-            dbContext.SaveChanges();
+            messageRepository.Save();
 
             return Ok();
         }
