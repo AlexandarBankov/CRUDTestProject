@@ -21,18 +21,44 @@ namespace CRUDTestProject.Controllers
 
 
         [HttpGet]
-        public IActionResult getAllMessagesContaining([FromQuery] string searchString = "", [FromQuery] bool isOrderAscending = true)
+        public IActionResult getAllMessagesContaining(
+            [FromQuery] string? searchInName,
+            [FromQuery] string? searchInContent,
+            [FromQuery] string? matchUsername,
+            [FromQuery] DateTime? messageIsAfter,
+            [FromQuery] DateTime? messageIsBefore,
+            [FromQuery] bool isOrderAscending = true)
         {
-            var orderedMessages = isOrderAscending ?
+            IEnumerable<Message>? result = isOrderAscending ?
                 messageRepository.GetAll().OrderBy(m => m.CreationDate)
-                : messageRepository.GetAll().OrderByDescending(m => m.CreationDate); 
-            
-            var result = orderedMessages
-                .Where(m => m.Content.Contains(searchString))
-                .Select(m => new MessageResponseModel(m))
-                .ToList();
+                : messageRepository.GetAll().OrderByDescending(m => m.CreationDate);
 
-            return Ok(result);
+            if (searchInContent is not null)
+            {
+                result = result.Where(m => m.Content.Contains(searchInContent));
+            }
+            if (searchInName is not null)
+            {
+                result = result.Where(m => m.Name.Contains(searchInName));
+            }
+            if (matchUsername is not null)
+            {
+                result = result.Where(m => m.User.Username == matchUsername);
+            }
+            if (messageIsAfter is not null)
+            {
+                result = result.Where(m => m.CreationDate > messageIsAfter);
+            }
+            if (messageIsBefore is not null)
+            {
+                result = result.Where(m => m.CreationDate < messageIsBefore);
+            }
+
+            return Ok(
+                result
+                .Select(m => new MessageResponseModel(m))
+                .ToList()
+                );
         }
 
         [HttpGet]
