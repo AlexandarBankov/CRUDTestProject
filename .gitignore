@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /CRUDTestProject/appsettings.json
 /CRUDTestProject/Properties/launchSettings.json
+/CRUDTestProject/appsettings.Development.json

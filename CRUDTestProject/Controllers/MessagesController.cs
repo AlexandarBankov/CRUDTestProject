@@ -3,6 +3,7 @@ using CRUDTestProject.Data.Entities;
 using CRUDTestProject.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CRUDTestProject.Controllers
 {
@@ -26,7 +27,7 @@ namespace CRUDTestProject.Controllers
                 : dbContext.Messages.OrderByDescending(m => m.CreationDate); 
             
             var result = orderedMessages
-                .Where(m => m.Content.Contains(searchString))
+                .Where(m => m.Content.Contains(searchString)).Include(m => m.User)
                 .ToList();
 
             return Ok(result);
