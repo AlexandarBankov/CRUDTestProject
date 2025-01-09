@@ -16,7 +16,7 @@ namespace CRUDTestProject.Data
             
             if (message is null)
             {
-                throw new ArgumentNullException();
+                throw new ArgumentNullException("Message with given id wasn't found.");
             }
             
             dbContext.Messages.Remove(message);
@@ -50,7 +50,7 @@ namespace CRUDTestProject.Data
 
             if (message is null)
             {
-                throw new ArgumentNullException();
+                throw new ArgumentNullException("Message with given id wasn't found.");
             }
 
             message.Name = name;

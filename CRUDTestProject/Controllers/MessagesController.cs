@@ -78,16 +78,8 @@ namespace CRUDTestProject.Controllers
         [Route("{id:guid}")]
         public IActionResult UpdateMessage(Guid id, UpdateMessageDto updateMessageDto) 
         {
-            Message message;
-            try
-            {
-                message = messageRepository.Update(id, updateMessageDto.Name, updateMessageDto.Content);
-            }
-            catch (ArgumentNullException)
-            {
-                return NotFound();
-            }
-
+            Message message = messageRepository.Update(id, updateMessageDto.Name, updateMessageDto.Content);
+            
             return Ok(new MessageResponseModel(message));
         }
 
@@ -95,14 +87,7 @@ namespace CRUDTestProject.Controllers
         [Route("{id:guid}")]
         public IActionResult DeleteMessage(Guid id) 
         {
-            try
-            {
-                messageRepository.Delete(id);
-            }
-            catch (ArgumentNullException)
-            {
-                return NotFound();
-            }
+            messageRepository.Delete(id);
 
             return Ok();
         }
