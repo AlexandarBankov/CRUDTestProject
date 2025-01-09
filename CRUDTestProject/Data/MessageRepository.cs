@@ -1,4 +1,5 @@
 ﻿using CRUDTestProject.Data.Entities;
+using CRUDTestProject.Middleware.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace CRUDTestProject.Data
@@ -16,7 +17,7 @@ namespace CRUDTestProject.Data
             
             if (message is null)
             {
-                throw new ArgumentNullException("Message with given id wasn't found.");
+                throw new NotFoundException("Message with given id wasn't found so it cannot be deleted.");
             }
             
             dbContext.Messages.Remove(message);
@@ -50,7 +51,7 @@ namespace CRUDTestProject.Data
 
             if (message is null)
             {
-                throw new ArgumentNullException("Message with given id wasn't found.");
+                throw new NotFoundException("Message with given id wasn't found so it cannot be updated.");
             }
 
             message.Name = name;

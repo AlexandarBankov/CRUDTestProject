@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+﻿using CRUDTestProject.Middleware.Exceptions;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CRUDTestProject.Middleware
@@ -11,10 +12,10 @@ namespace CRUDTestProject.Middleware
             CancellationToken cancellationToken)
         {
             ProblemDetails problemDetails = new ProblemDetails();
-            
+
             switch (exception)
             {
-                case ArgumentNullException:
+                case NotFoundException:
                     problemDetails.Status = StatusCodes.Status404NotFound;
                     problemDetails.Title = exception.Message;
                     break;
