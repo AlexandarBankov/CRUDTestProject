@@ -21,18 +21,27 @@ namespace CRUDTestProject.Controllers
 
 
         [HttpGet]
-        public IActionResult getAllMessagesContaining([FromQuery] string searchString = "", [FromQuery] bool isOrderAscending = true)
+        public IActionResult getMessagesPassingFilter(
+            [FromQuery] MessageFilterParameters filterParameters,
+            [FromQuery] string? matchUsername,
+            [FromQuery] bool isOrderAscending = true)
         {
-            var orderedMessages = isOrderAscending ?
+            IEnumerable<Message> result = isOrderAscending ?
                 messageRepository.GetAll().OrderBy(m => m.CreationDate)
-                : messageRepository.GetAll().OrderByDescending(m => m.CreationDate); 
-            
-            var result = orderedMessages
-                .Where(m => m.Content.Contains(searchString))
-                .Select(m => new MessageResponseModel(m))
-                .ToList();
+                : messageRepository.GetAll().OrderByDescending(m => m.CreationDate);
 
-            return Ok(result);
+            if (matchUsername is not null)
+            {
+                result = result.Where(m => m.User.Username == matchUsername);
+            }
+            result = filterParameters.filterMessages(result);
+            
+
+            return Ok(
+                result
+                .Select(m => new MessageResponseModel(m))
+                .ToList()
+                );
         }
 
         [HttpGet]
