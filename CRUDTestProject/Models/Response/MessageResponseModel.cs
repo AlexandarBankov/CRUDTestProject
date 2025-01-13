@@ -2,22 +2,15 @@
 
 namespace CRUDTestProject.Models.Response
 {
-    public class MessageResponseModel
+    public class MessageResponseModel(Message message)
     {
-        public MessageResponseModel(Message message)
-        {
-            this.Id = message.Id;
-            this.Name = message.Name;
-            this.Content = message.Content;
-            this.CreationDate = message.CreationDate;
-            this.User = new UserResponseModel(message.User);
-        }
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string Content { get; set; }
+        public Guid Id { get; set; } = message.Id;
+        public string Name { get; set; } = message.Name;
+        public string Content { get; set; } = message.Content;
 
-        public DateTime CreationDate { get; set; }
+        public DateTime CreationDate { get; set; } = message.CreationDate;
 
-        public UserResponseModel User { get; set; }
+        //Data of the poster
+        public string Username { get; set; } = message.Username;
     }
 }

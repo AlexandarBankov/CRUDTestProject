@@ -34,7 +34,7 @@ namespace CRUDTestProject.Controllers
 
             if (matchUsername is not null)
             {
-                result = result.Where(m => m.User.Username == matchUsername);
+                result = result.Where(m => m.Username == matchUsername);
             }
             result = filterParameters.filterMessages(result);
             
@@ -68,7 +68,8 @@ namespace CRUDTestProject.Controllers
                 Name = addMessageDto.Name, 
                 Content = addMessageDto.Content,
                 CreationDate = DateTime.Now,
-                User = messageRepository.GetUser()
+                Username = User.FindFirstValue(ClaimTypes.Name),
+                Email = User.FindFirstValue(ClaimTypes.Email)
             };
 
             messageRepository.Insert(messageEntity);

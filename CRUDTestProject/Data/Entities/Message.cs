@@ -8,7 +8,8 @@
 
         public required DateTime CreationDate { get; set; }
 
-        public required virtual User User { get; set; }
-
+        //Data of the poster
+        public required string Username { get; set; }
+        public required string Email { get; set; }
     }
 }

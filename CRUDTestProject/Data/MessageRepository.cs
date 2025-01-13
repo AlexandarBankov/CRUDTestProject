@@ -26,17 +26,12 @@ namespace CRUDTestProject.Data
 
         public IEnumerable<Message> GetAll()
         {
-            return dbContext.Messages.Include(m => m.User).AsNoTracking();
+            return dbContext.Messages.AsNoTracking();
         }
 
         public Message? GetById(Guid id)
         {
-            return dbContext.Messages.Include(m => m.User).Where(m => m.Id == id).AsNoTracking().FirstOrDefault();
-        }
-
-        public User GetUser()
-        {
-            return dbContext.Users.First();
+            return dbContext.Messages.Where(m => m.Id == id).AsNoTracking().FirstOrDefault();
         }
 
         public void Insert(Message message)
@@ -47,7 +42,7 @@ namespace CRUDTestProject.Data
 
         public Message Update(Guid id, string name, string content)
         {
-            var message = dbContext.Messages.Include(m => m.User).Where(m => m.Id == id).FirstOrDefault();
+            var message = dbContext.Messages.Where(m => m.Id == id).FirstOrDefault();
 
             if (message is null)
             {
