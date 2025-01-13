@@ -11,5 +11,7 @@ namespace CRUDTestProject.Data
         void Insert(Message message);
         Message Update(Guid id, string name, string content);
         void Delete(Guid id);
+
+        string? GetPosterUsernameById(Guid id);
     }
 }

@@ -9,7 +9,7 @@ namespace CRUDTestProject.Models
         public DateTime? CreationIsAfter { get; set; }
         public DateTime? CreationIsBefore { get; set; }
 
-        public IEnumerable<Message> filterMessages(IEnumerable<Message> messages) 
+        public IEnumerable<Message> FilterMessages(IEnumerable<Message> messages) 
         {
             if (SearchInContent is not null)
             {

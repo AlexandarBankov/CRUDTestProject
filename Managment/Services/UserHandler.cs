@@ -23,9 +23,9 @@ namespace Management.Services
 
             var authClaims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new(ClaimTypes.Name, user.UserName),
+                    new(ClaimTypes.Email, user.Email),
+                    new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 };
 
             return GetToken(authClaims);

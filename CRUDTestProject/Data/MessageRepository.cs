@@ -4,22 +4,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CRUDTestProject.Data
 {
-    public class MessageRepository : IMessageRepository
+    public class MessageRepository(ApplicationDbContext dbContext) : IMessageRepository
     {
-        private readonly ApplicationDbContext dbContext;
-        public MessageRepository(ApplicationDbContext dbContext)
-        {
-            this.dbContext = dbContext;
-        }
         public void Delete(Guid id)
         {
-            var message = dbContext.Messages.Find(id);
-            
-            if (message is null)
-            {
-                throw new NotFoundException("Message with given id wasn't found so it cannot be deleted.");
-            }
-            
+            var message = dbContext.Messages.Find(id) ?? throw new NotFoundException("Message with given id wasn't found.");
             dbContext.Messages.Remove(message);
             dbContext.SaveChanges();
         }
@@ -34,6 +23,18 @@ namespace CRUDTestProject.Data
             return dbContext.Messages.Where(m => m.Id == id).AsNoTracking().FirstOrDefault();
         }
 
+        public string? GetPosterUsernameById(Guid id)
+        {
+            var message = this.GetById(id);
+
+            if (message is not null)
+            {
+                return message.Username;
+            }
+
+            return null;
+        }
+
         public void Insert(Message message)
         {
             dbContext.Messages.Add(message);
@@ -42,13 +43,7 @@ namespace CRUDTestProject.Data
 
         public Message Update(Guid id, string name, string content)
         {
-            var message = dbContext.Messages.Where(m => m.Id == id).FirstOrDefault();
-
-            if (message is null)
-            {
-                throw new NotFoundException("Message with given id wasn't found so it cannot be updated.");
-            }
-
+            var message = dbContext.Messages.Where(m => m.Id == id).FirstOrDefault() ?? throw new NotFoundException("Message with given id wasn't found so it cannot be updated.");
             message.Name = name;
             message.Content = content;
             

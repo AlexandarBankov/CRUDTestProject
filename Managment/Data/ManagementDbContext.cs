@@ -4,10 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Management.Data
 {
-    public class ManagementDbContext : IdentityDbContext<User>
+    public class ManagementDbContext(DbContextOptions<ManagementDbContext> options) : IdentityDbContext<User>(options)
     {
-        public ManagementDbContext(DbContextOptions<ManagementDbContext> options) 
-            : base(options)
-        { }
     }
 }
