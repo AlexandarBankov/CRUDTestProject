@@ -1,9 +1,12 @@
-using CRUDTestProject.Data;
-using CRUDTestProject.Middleware;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Management.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Management.Data.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Management.Middleware;
+using Management.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,10 +17,23 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
 var connectionString = builder.Configuration.GetConnectionString("default");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+builder.Services.AddDbContext<ManagementDbContext>(options =>
     options.UseSqlServer(connectionString));
+
+builder.Services.AddIdentity<User, IdentityRole>(options => 
+{
+    options.SignIn.RequireConfirmedAccount = true;
+    options.Password.RequireDigit = false;
+    options.Password.RequiredLength = 5;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+})
+    .AddEntityFrameworkStores<ManagementDbContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.AddScoped<IUserHandler, UserHandler>();
 
 var configuration = builder.Configuration;
 // Adding Authentication
@@ -43,8 +59,6 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddScoped<IMessageRepository, MessageRepository>();
-
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
@@ -58,8 +72,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-
 
 app.UseHttpsRedirection();
 

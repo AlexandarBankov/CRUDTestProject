@@ -2,9 +2,11 @@
 using CRUDTestProject.Data.Entities;
 using CRUDTestProject.Models;
 using CRUDTestProject.Models.Response;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace CRUDTestProject.Controllers
 {
@@ -90,6 +92,16 @@ namespace CRUDTestProject.Controllers
             messageRepository.Delete(id);
 
             return Ok();
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("[action]")]
+        public IActionResult getUsername()
+        {
+            var name = User.FindFirstValue(ClaimTypes.Name);
+
+            return Ok(name);
         }
     }
 }
