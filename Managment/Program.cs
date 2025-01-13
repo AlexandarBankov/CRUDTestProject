@@ -5,6 +5,8 @@ using Management.Data.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Management.Middleware;
+using Management.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +33,8 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
     .AddEntityFrameworkStores<ManagementDbContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.AddScoped<IUserHandler, UserHandler>();
+
 var configuration = builder.Configuration;
 // Adding Authentication
 builder.Services.AddAuthentication(options =>
@@ -55,7 +59,12 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
