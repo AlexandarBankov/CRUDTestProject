@@ -4,7 +4,7 @@ using Moq;
 
 namespace MessagesTests.Controller
 {
-    public class RepositoryFixture 
+    public class RepositoryFixture
     {
         public Mock<IMessageRepository> Mock { get; private set; }
         public IMessageRepository Repository { get; private set; }
@@ -34,6 +34,10 @@ namespace MessagesTests.Controller
             Mock.Setup(repository => repository.GetById(MissingId)).Returns(m);
             
             Mock.Setup(repository => repository.Insert(It.IsAny<Message>()));
+
+            Mock.Setup(repository => repository.Delete(It.IsAny<Guid>()));
+
+            Mock.Setup(repository => repository.GetPosterUsernameById(ExistingId)).Returns(message.Name);
             
             Repository = Mock.Object;
         }
