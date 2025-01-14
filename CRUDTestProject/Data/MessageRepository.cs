@@ -4,39 +4,35 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CRUDTestProject.Data
 {
-    public class MessageRepository : IMessageRepository
+    public class MessageRepository(ApplicationDbContext dbContext) : IMessageRepository
     {
-        private readonly ApplicationDbContext dbContext;
-        public MessageRepository(ApplicationDbContext dbContext)
-        {
-            this.dbContext = dbContext;
-        }
         public void Delete(Guid id)
         {
-            var message = dbContext.Messages.Find(id);
-            
-            if (message is null)
-            {
-                throw new NotFoundException("Message with given id wasn't found so it cannot be deleted.");
-            }
-            
+            var message = dbContext.Messages.Find(id) ?? throw new NotFoundException("Message with given id wasn't found.");
             dbContext.Messages.Remove(message);
             dbContext.SaveChanges();
         }
 
         public IEnumerable<Message> GetAll()
         {
-            return dbContext.Messages.Include(m => m.User).AsNoTracking();
+            return dbContext.Messages.AsNoTracking();
         }
 
         public Message? GetById(Guid id)
         {
-            return dbContext.Messages.Include(m => m.User).Where(m => m.Id == id).AsNoTracking().FirstOrDefault();
+            return dbContext.Messages.Where(m => m.Id == id).AsNoTracking().FirstOrDefault();
         }
 
-        public User GetUser()
+        public string? GetPosterUsernameById(Guid id)
         {
-            return dbContext.Users.First();
+            var message = this.GetById(id);
+
+            if (message is not null)
+            {
+                return message.Username;
+            }
+
+            return null;
         }
 
         public void Insert(Message message)
@@ -47,13 +43,7 @@ namespace CRUDTestProject.Data
 
         public Message Update(Guid id, string name, string content)
         {
-            var message = dbContext.Messages.Include(m => m.User).Where(m => m.Id == id).FirstOrDefault();
-
-            if (message is null)
-            {
-                throw new NotFoundException("Message with given id wasn't found so it cannot be updated.");
-            }
-
+            var message = dbContext.Messages.Where(m => m.Id == id).FirstOrDefault() ?? throw new NotFoundException("Message with given id wasn't found so it cannot be updated.");
             message.Name = name;
             message.Content = content;
             

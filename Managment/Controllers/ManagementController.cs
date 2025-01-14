@@ -1,8 +1,5 @@
-﻿using Management.Data.Entities;
-using Management.Models;
+﻿using Management.Models;
 using Management.Services;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Management.Controllers

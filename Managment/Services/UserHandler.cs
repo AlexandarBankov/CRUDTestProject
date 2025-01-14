@@ -2,7 +2,6 @@
 using Management.Middleware.Exceptions;
 using Management.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -23,8 +22,9 @@ namespace Management.Services
 
             var authClaims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new(ClaimTypes.Name, user.UserName),
+                    new(ClaimTypes.Email, user.Email),
+                    new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 };
 
             return GetToken(authClaims);

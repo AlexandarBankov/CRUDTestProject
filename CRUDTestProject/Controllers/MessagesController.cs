@@ -3,27 +3,17 @@ using CRUDTestProject.Data.Entities;
 using CRUDTestProject.Models;
 using CRUDTestProject.Models.Response;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace CRUDTestProject.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class MessagesController : ControllerBase
+    public class MessagesController(IMessageRepository messageRepository) : ControllerBase
     {
-        private readonly IMessageRepository messageRepository;
-
-        public MessagesController(IMessageRepository messageRepository)
-        {
-            this.messageRepository = messageRepository;
-        }
-
-
         [HttpGet]
-        public IActionResult getMessagesPassingFilter(
+        public IActionResult GetMessagesPassingFilter(
             [FromQuery] MessageFilterParameters filterParameters,
             [FromQuery] string? matchUsername,
             [FromQuery] bool isOrderAscending = true)
@@ -34,9 +24,9 @@ namespace CRUDTestProject.Controllers
 
             if (matchUsername is not null)
             {
-                result = result.Where(m => m.User.Username == matchUsername);
+                result = result.Where(m => m.Username == matchUsername);
             }
-            result = filterParameters.filterMessages(result);
+            result = filterParameters.FilterMessages(result);
             
 
             return Ok(
@@ -48,7 +38,7 @@ namespace CRUDTestProject.Controllers
 
         [HttpGet]
         [Route("{id:guid}")]
-        public IActionResult getMessageById(Guid id)
+        public IActionResult GetMessageById(Guid id)
         {
             var message = messageRepository.GetById(id);
 
@@ -61,6 +51,7 @@ namespace CRUDTestProject.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public IActionResult AddMessage(AddMessageDto addMessageDto)
         {
             var messageEntity = new Message 
@@ -68,7 +59,8 @@ namespace CRUDTestProject.Controllers
                 Name = addMessageDto.Name, 
                 Content = addMessageDto.Content,
                 CreationDate = DateTime.Now,
-                User = messageRepository.GetUser()
+                Username = User.FindFirstValue(ClaimTypes.Name),
+                Email = User.FindFirstValue(ClaimTypes.Email)
             };
 
             messageRepository.Insert(messageEntity);
@@ -77,18 +69,32 @@ namespace CRUDTestProject.Controllers
         }
 
         [HttpPut]
+        [Authorize]
         [Route("{id:guid}")]
         public IActionResult UpdateMessage(Guid id, UpdateMessageDto updateMessageDto) 
         {
+            var posterUsername = messageRepository.GetPosterUsernameById(id);
+            
+            if (posterUsername != User.FindFirstValue(ClaimTypes.Name))
+            {
+                return Unauthorized("You can only update your own messages.");
+            }
+
             Message message = messageRepository.Update(id, updateMessageDto.Name, updateMessageDto.Content);
             
             return Ok(new MessageResponseModel(message));
         }
 
         [HttpDelete]
+        [Authorize]
         [Route("{id:guid}")]
         public IActionResult DeleteMessage(Guid id) 
         {
+            var posterUsername = messageRepository.GetPosterUsernameById(id);
+            if (posterUsername != User.FindFirstValue(ClaimTypes.Name))
+            {
+                return Unauthorized("You can delete only your own posted messages.");
+            }
             messageRepository.Delete(id);
 
             return Ok();
@@ -97,7 +103,7 @@ namespace CRUDTestProject.Controllers
         [HttpGet]
         [Authorize]
         [Route("[action]")]
-        public IActionResult getUsername()
+        public IActionResult GetUsername()
         {
             var name = User.FindFirstValue(ClaimTypes.Name);
 

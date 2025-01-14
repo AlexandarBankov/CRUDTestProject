@@ -11,7 +11,7 @@ namespace CRUDTestProject.Middleware
             Exception exception,
             CancellationToken cancellationToken)
         {
-            ProblemDetails problemDetails = new ProblemDetails();
+            ProblemDetails problemDetails = new();
 
             switch (exception)
             {
