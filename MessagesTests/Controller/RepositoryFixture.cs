@@ -7,7 +7,6 @@ namespace MessagesTests.Controller
     public class RepositoryFixture
     {
         public Mock<IMessageRepository> Mock { get; private set; }
-        public IMessageRepository Repository { get; private set; }
         public Guid ExistingId { get; private set; }
         public Guid MissingId { get; private set; }
 
@@ -39,7 +38,7 @@ namespace MessagesTests.Controller
 
             Mock.Setup(repository => repository.GetPosterUsernameById(ExistingId)).Returns(message.Name);
             
-            Repository = Mock.Object;
+            Mock.Setup(repository => repository.Update(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).Returns(message);
         }
     }
 }

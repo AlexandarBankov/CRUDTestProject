@@ -1,5 +1,6 @@
 using CRUDTestProject.Controllers;
 using CRUDTestProject.Data.Entities;
+using CRUDTestProject.Models;
 using CRUDTestProject.Models.Response;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,11 +13,14 @@ namespace MessagesTests.Controller
     {
         private readonly RepositoryFixture fixture;
         private readonly MessagesController controller;
-
+        private const string USERNAME = "username";
+        private const string EMAIL = "email";
+        private const string CONTENT = "content";
+        private const string NAME = "name";
         public ControllerTests()
         {
             fixture = new();
-            controller = new(fixture.Repository);
+            controller = new(fixture.Mock.Object);
         }
 
         private void mockUserInController(string username, string email)
@@ -64,16 +68,11 @@ namespace MessagesTests.Controller
         [Fact]
         public void AddMessage()
         {
-            const string USERNAME = "username";
-            const string EMAIL = "email";
-            const string CONTENT = "content";
-            const string NAME = "name";
-
             mockUserInController(USERNAME, EMAIL);
 
             var response = controller.AddMessage(new() { Content = CONTENT, Name = NAME });
 
-            fixture.Mock.Verify(m => m.Insert(It.IsAny<Message>()), Times.Once());
+            fixture.Mock.Verify(m => m.Insert(It.IsAny<Message>()), Times.Once);
 
             Assert.IsType<OkObjectResult>(response);
 
@@ -97,7 +96,7 @@ namespace MessagesTests.Controller
 
             Assert.IsType<UnauthorizedObjectResult>(response);
 
-            fixture.Mock.Verify(m => m.Delete(It.IsAny<Guid>()), Times.Never());
+            fixture.Mock.Verify(m => m.Delete(It.IsAny<Guid>()), Times.Never);
         }
 
         [Fact]
@@ -109,7 +108,53 @@ namespace MessagesTests.Controller
 
             Assert.IsType<OkResult>(response);
 
-            fixture.Mock.Verify(m => m.Delete(It.IsAny<Guid>()), Times.Once());
+            fixture.Mock.Verify(m => m.Delete(It.IsAny<Guid>()), Times.Once);
+        }
+
+        [Fact]
+        public void UpdateMessageOfSomeoneElse()
+        {
+            mockUserInController(fixture.message.Username + "notEmpty", string.Empty);
+
+            var response = controller.UpdateMessage(fixture.message.Id, new UpdateMessageDto() { Content = String.Empty, Name = String.Empty });
+
+            Assert.IsType<UnauthorizedObjectResult>(response);
+
+            fixture.Mock.Verify(m => m.Update(It.IsAny<Guid>(), string.Empty, string.Empty), Times.Never);
+        }
+
+        [Fact]
+        public void UpdateYourMessage()
+        {
+            mockUserInController(fixture.message.Username, string.Empty);
+
+            var response = controller.UpdateMessage(fixture.message.Id, new UpdateMessageDto() { Content = CONTENT, Name = NAME });
+
+            Assert.IsType<OkObjectResult>(response);
+
+            fixture.Mock.Verify(m => m.Update(It.IsAny<Guid>(), NAME, CONTENT), Times.Once);
+
+            var result = response as OkObjectResult;
+            Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
+            Assert.IsType<MessageResponseModel>(result.Value);
+        }
+
+        [Fact]
+        public void GetUsernameReturnsUsername()
+        {
+            mockUserInController(USERNAME, EMAIL);
+
+            var response = controller.GetUsername();
+
+            Assert.IsType<OkObjectResult>(response);
+
+            var result = response as OkObjectResult;
+            Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
+            Assert.IsType<string>(result.Value);
+
+            var username = result.Value as string;
+
+            Assert.Equal(USERNAME, username);
         }
     }
 }
