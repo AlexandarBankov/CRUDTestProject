@@ -1,18 +1,23 @@
 ﻿using CRUDTestProject.Data;
 using CRUDTestProject.Data.Entities;
+using CRUDTestProject.Models;
 using CRUDTestProject.Models.Response;
-using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Text.Json;
+using System.Security.Claims;
+using System.Text;
 
 namespace MessagesTests.Integration
 {
     public class MessageApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
     {
         private readonly HttpClient client;
+        private readonly CustomWebApplicationFactory factory;
 
         private List<Message> getMessages()
         {
@@ -36,6 +41,8 @@ namespace MessagesTests.Integration
                 context.UpdateRange(getMessages());
                 context.SaveChanges();
             }
+
+            this.factory = factory;
         }
 
         [Fact]
@@ -50,5 +57,35 @@ namespace MessagesTests.Integration
             Assert.Equal(getMessages().Count, messageList.Count);
         }
 
+        private JwtSecurityToken GetToken()
+        {
+            List<Claim> authClaims = new List<Claim>() { new Claim(ClaimTypes.Name, "1u"), new Claim(ClaimTypes.Email, "1e")};
+            var configuration = factory.Services.CreateScope().ServiceProvider.GetRequiredService<IConfiguration>();
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]));
+
+            var token = new JwtSecurityToken(
+                issuer: configuration["JWT:Issuer"],
+                audience: configuration["JWT:Audience"],
+                expires: DateTime.Now.AddHours(1),
+                claims: authClaims,
+                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+                );
+
+            return token;
+        }
+
+        [Fact]
+        public async Task PostMessageWhenLoggedIn()
+        {
+            var token = new JwtSecurityTokenHandler().WriteToken(GetToken());
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await client.PostAsJsonAsync("/api/messages", new AddMessageDto() { Content = "content", Name = "name"});
+            response.EnsureSuccessStatusCode();
+            var result = await response.Content.ReadAsStringAsync();
+            var message = JsonConvert.DeserializeObject<MessageResponseModel>(result);
+
+        }
     }
 }

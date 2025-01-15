@@ -23,7 +23,6 @@ namespace MessagesTests.Integration
 
                 services.AddDbContext<ApplicationDbContext>(options =>
                     options.UseInMemoryDatabase("TestDb"));
-
             });
         }
     }
