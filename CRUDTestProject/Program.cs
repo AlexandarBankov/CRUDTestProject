@@ -14,10 +14,13 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddSingleton<SoftDeleteInterceptor>();
 
 var connectionString = builder.Configuration.GetConnectionString("default");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
+    options
+    .UseSqlServer(connectionString)
+    .AddInterceptors(serviceProvider.GetRequiredService<SoftDeleteInterceptor>()));
 
 var configuration = builder.Configuration;
 // Adding Authentication
@@ -69,4 +72,4 @@ app.MapControllers();
 
 app.Run();
 
-public partial class Program {}
+public partial class Program { }
