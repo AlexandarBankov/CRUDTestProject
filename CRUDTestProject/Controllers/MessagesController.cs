@@ -100,6 +100,32 @@ namespace CRUDTestProject.Controllers
             return Ok();
         }
 
+        [HttpPatch]
+        [Authorize]
+        [Route("{id:guid}")]
+        public IActionResult RestoreMessage(Guid id)
+        {
+            var posterUsername = messageRepository.GetPosterUsernameById(id);
+            if (posterUsername != User.FindFirstValue(ClaimTypes.Name))
+            {
+                return Unauthorized("You can restore only your own posted messages.");
+            }
+            messageRepository.Restore(id);
+
+            return Ok();
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("[action]")]
+        public IActionResult GetDeleted()
+        {
+            var messages = messageRepository.GetDeleted()
+                .Where(m => m.Username == User.FindFirstValue(ClaimTypes.Name));
+
+            return Ok(messages.Select(m => new MessageResponseModel(m)));
+        }
+
         [HttpGet]
         [Authorize]
         [Route("[action]")]

@@ -6,26 +6,34 @@ namespace CRUDTestProject.Data
 {
     public class MessageRepository(ApplicationDbContext dbContext) : IMessageRepository
     {
+        private IQueryable<Message> notDeleted => dbContext.Messages.Where(m => !m.IsDeleted);
+        private IQueryable<Message> deleted => dbContext.Messages.Where(m => m.IsDeleted);
+
         public void Delete(Guid id)
         {
-            var message = dbContext.Messages.Find(id) ?? throw new NotFoundException("Message with given id wasn't found.");
+            var message = notDeleted.Where(m => m.Id == id).FirstOrDefault() ?? throw new NotFoundException("Invalid message id for deletion.");
             dbContext.Messages.Remove(message);
             dbContext.SaveChanges();
         }
 
         public IEnumerable<Message> GetAll()
         {
-            return dbContext.Messages.AsNoTracking();
+            return notDeleted.AsNoTracking();
         }
 
         public Message? GetById(Guid id)
         {
-            return dbContext.Messages.Where(m => m.Id == id).AsNoTracking().FirstOrDefault();
+            return notDeleted.Where(m => m.Id == id).AsNoTracking().FirstOrDefault();
+        }
+
+        public IEnumerable<Message> GetDeleted()
+        {
+            return deleted.AsNoTracking();
         }
 
         public string? GetPosterUsernameById(Guid id)
         {
-            var message = this.GetById(id);
+            var message = dbContext.Messages.Find(id);
 
             if (message is not null)
             {
@@ -41,9 +49,17 @@ namespace CRUDTestProject.Data
             dbContext.SaveChanges();
         }
 
+        public void Restore(Guid id)
+        {
+            var message = deleted.Where(m => m.Id == id).FirstOrDefault() ?? throw new NotFoundException("Invalid message id for restoration.");
+            message.IsDeleted = false;
+            message.DeletedOn = null;
+            dbContext.SaveChanges();
+        }
+
         public Message Update(Guid id, string name, string content)
         {
-            var message = dbContext.Messages.Where(m => m.Id == id).FirstOrDefault() ?? throw new NotFoundException("Message with given id wasn't found so it cannot be updated.");
+            var message = notDeleted.Where(m => m.Id == id).FirstOrDefault() ?? throw new NotFoundException("Invalid message id for update.");
             message.Name = name;
             message.Content = content;
             
