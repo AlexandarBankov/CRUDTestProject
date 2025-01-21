@@ -1,7 +1,7 @@
-﻿using CRUDTestProject.Data;
-using CRUDTestProject.Data.Entities;
+﻿using CRUDTestProject.Data.Entities;
 using CRUDTestProject.Models;
 using CRUDTestProject.Models.Response;
+using CRUDTestProject.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -10,7 +10,7 @@ namespace CRUDTestProject.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class MessagesController(IMessageRepository messageRepository) : ControllerBase
+    public class MessagesController(IMessageHandler messageHandler) : ControllerBase
     {
         [HttpGet]
         public IActionResult GetMessagesPassingFilter(
@@ -19,8 +19,8 @@ namespace CRUDTestProject.Controllers
             [FromQuery] bool isOrderAscending = true)
         {
             IEnumerable<Message> result = isOrderAscending ?
-                messageRepository.GetAll().OrderBy(m => m.CreationDate)
-                : messageRepository.GetAll().OrderByDescending(m => m.CreationDate);
+                messageHandler.GetAll().OrderBy(m => m.CreationDate)
+                : messageHandler.GetAll().OrderByDescending(m => m.CreationDate);
 
             if (matchUsername is not null)
             {
@@ -40,7 +40,7 @@ namespace CRUDTestProject.Controllers
         [Route("{id:guid}")]
         public IActionResult GetMessageById(Guid id)
         {
-            var message = messageRepository.GetById(id);
+            var message = messageHandler.GetById(id);
 
             if (message is null)
             {
@@ -63,7 +63,7 @@ namespace CRUDTestProject.Controllers
                 Email = User.FindFirstValue(ClaimTypes.Email)
             };
 
-            messageRepository.Insert(messageEntity);
+            messageHandler.Insert(messageEntity);
             
             return Ok(new MessageResponseModel(messageEntity));
         }
@@ -73,14 +73,14 @@ namespace CRUDTestProject.Controllers
         [Route("{id:guid}")]
         public IActionResult UpdateMessage(Guid id, UpdateMessageDto updateMessageDto) 
         {
-            var posterUsername = messageRepository.GetPosterUsernameById(id);
+            var posterUsername = messageHandler.GetPosterUsernameById(id);
             
             if (posterUsername != User.FindFirstValue(ClaimTypes.Name))
             {
                 return Unauthorized("You can only update your own messages.");
             }
 
-            Message message = messageRepository.Update(id, updateMessageDto.Name, updateMessageDto.Content);
+            Message message = messageHandler.Update(id, updateMessageDto.Name, updateMessageDto.Content);
             
             return Ok(new MessageResponseModel(message));
         }
@@ -90,12 +90,12 @@ namespace CRUDTestProject.Controllers
         [Route("{id:guid}")]
         public IActionResult DeleteMessage(Guid id) 
         {
-            var posterUsername = messageRepository.GetPosterUsernameById(id);
+            var posterUsername = messageHandler.GetPosterUsernameById(id);
             if (posterUsername != User.FindFirstValue(ClaimTypes.Name))
             {
                 return Unauthorized("You can delete only your own posted messages.");
             }
-            messageRepository.Delete(id);
+            messageHandler.Delete(id);
 
             return Ok();
         }
@@ -105,12 +105,12 @@ namespace CRUDTestProject.Controllers
         [Route("{id:guid}")]
         public IActionResult RestoreMessage(Guid id)
         {
-            var posterUsername = messageRepository.GetPosterUsernameById(id);
+            var posterUsername = messageHandler.GetPosterUsernameById(id);
             if (posterUsername != User.FindFirstValue(ClaimTypes.Name))
             {
                 return Unauthorized("You can restore only your own posted messages.");
             }
-            messageRepository.Restore(id);
+            messageHandler.Restore(id);
 
             return Ok();
         }
@@ -120,7 +120,7 @@ namespace CRUDTestProject.Controllers
         [Route("[action]")]
         public IActionResult GetDeleted()
         {
-            var messages = messageRepository.GetDeleted()
+            var messages = messageHandler.GetDeleted()
                 .Where(m => m.Username == User.FindFirstValue(ClaimTypes.Name));
 
             return Ok(messages.Select(m => new MessageResponseModel(m)));

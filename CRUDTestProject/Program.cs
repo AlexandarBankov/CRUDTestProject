@@ -2,6 +2,7 @@ using Cronos;
 using CRUDTestProject.Data;
 using CRUDTestProject.Middleware;
 using CRUDTestProject.Scheduling;
+using CRUDTestProject.Services;
 using EasyCronJob.Core;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -50,6 +51,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+builder.Services.AddScoped<IMessageHandler, MessageHandler>();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();

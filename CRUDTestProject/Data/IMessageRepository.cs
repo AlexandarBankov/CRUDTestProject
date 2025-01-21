@@ -4,17 +4,12 @@ namespace CRUDTestProject.Data
 {
     public interface IMessageRepository
     {
-        //returns all messages that haven't been deleted
-        IEnumerable<Message> GetAll();
-        IEnumerable<Message> GetDeleted();
-
+        IQueryable<Message> Messages { get; }
+        //Not to be tracked for changes
         Message? GetById(Guid id);
-
+        void Delete(Message message);
         void Insert(Message message);
-        Message Update(Guid id, string name, string content);
-        void Delete(Guid id);
-        void Restore(Guid id);
-
-        string? GetPosterUsernameById(Guid id);
+        void Restore(Message message);
+        void Update(Message message, string name, string content);
     }
 }
