@@ -1,5 +1,8 @@
+using Cronos;
 using CRUDTestProject.Data;
 using CRUDTestProject.Middleware;
+using CRUDTestProject.Scheduling;
+using EasyCronJob.Core;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -50,6 +53,13 @@ builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
+
+builder.Services.ApplyResulation<RemoveOldSoftDeletedMessages>(options => 
+{
+    options.CronExpression = "0 2 * * *"; // every day at 02:00 AM
+    options.TimeZoneInfo = TimeZoneInfo.Local;
+    options.CronFormat = Cronos.CronFormat.Standard;
+});
 
 var app = builder.Build();
 
