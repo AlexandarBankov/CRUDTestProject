@@ -28,16 +28,25 @@ namespace CRUDTestProject.Scheduling
         public override Task DoWork(CancellationToken cancellationToken)
         {
             logger.LogInformation($"Removing messages that have been soft deleted for more than {DAYS} days. Start Time : {DateTime.Now}");
-            using (var scope = serviceProvider.CreateScope())
+            try
             {
-                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                using (var scope = serviceProvider.CreateScope())
+                {
 
-                DateTime removeBefore = DateTime.Now - TimeSpan.FromDays(DAYS);
+                    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-                var affected = dbContext.Messages.Where(m => m.IsDeleted)
-                                .Where(m => m.DeletedOn < removeBefore).ExecuteDelete();
+                    DateTime removeBefore = DateTime.Now - TimeSpan.FromDays(DAYS);
 
-                logger.LogInformation("Removed: " + affected + " old soft deleted messages");
+                    var affected = dbContext.Messages.Where(m => m.IsDeleted)
+                                    .Where(m => m.DeletedOn < removeBefore).ExecuteDelete();
+
+                    logger.LogInformation("Removed: " + affected + " old soft deleted messages");
+
+                }
+            }
+            catch (Exception e) 
+            {
+                logger.LogError(e, "Unexpected error in RemoveOldSoftDeletedMessages");
             }
             return base.DoWork(cancellationToken);
         }
