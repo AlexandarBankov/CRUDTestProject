@@ -1,5 +1,4 @@
 ﻿using CRUDTestProject.Data.Entities;
-using CRUDTestProject.Middleware.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace CRUDTestProject.Data

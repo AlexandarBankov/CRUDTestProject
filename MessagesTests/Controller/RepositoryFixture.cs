@@ -1,12 +1,12 @@
-﻿using CRUDTestProject.Data;
-using CRUDTestProject.Data.Entities;
+﻿using CRUDTestProject.Data.Entities;
+using CRUDTestProject.Services;
 using Moq;
 
 namespace MessagesTests.Controller
 {
     public class RepositoryFixture
     {
-        public Mock<IMessageRepository> Mock { get; private set; }
+        public Mock<IMessageHandler> Mock { get; private set; }
         public Guid ExistingId { get; private set; }
         public Guid MissingId { get; private set; }
 

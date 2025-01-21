@@ -2,6 +2,7 @@
 using CRUDTestProject.Data.Entities;
 using CRUDTestProject.Middleware.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MessagesTests.Repository
 {
@@ -10,12 +11,15 @@ namespace MessagesTests.Repository
         private IMessageRepository repository;
         private DbContextOptions<ApplicationDbContext> options;
         private ApplicationDbContext context; 
-        private readonly Message message = new() { Content = "Content", CreationDate = DateTime.Now, Email = "Email", Name = "Name", Username = "Username", Id = Guid.NewGuid() };
+        private Message message = new() { Content = "Content", CreationDate = DateTime.Now, Email = "Email", Name = "Name", Username = "Username", Id = Guid.NewGuid() };
+        private Message toRestore = new() { Content = "Content", CreationDate = DateTime.Now.AddDays(-5), Email = "Email", Name = "Name", Username = "Username", Id = Guid.NewGuid() , DeletedOn = DateTime.Now, IsDeleted = true};
         private readonly Guid missingId = Guid.NewGuid();
         public RepositoryTests()
         {
+
             options = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseInMemoryDatabase(databaseName: "database")
+            .AddInterceptors(new SoftDeleteInterceptor())
             .Options;
 
             // Insert seed data into the database using one instance of the context
@@ -24,6 +28,7 @@ namespace MessagesTests.Repository
             context.RemoveRange(context.Messages);
 
             context.Messages.Add(message);
+            context.Messages.Add(toRestore);
             context.SaveChanges();
 
             repository = new MessageRepository(context);
@@ -32,15 +37,10 @@ namespace MessagesTests.Repository
         [Fact]
         public void DeleteExisting() 
         {
-            repository.Delete(message.Id);
+            repository.Delete(message);
 
-            Assert.Null(context.Messages.Find(message.Id));
-        }
-
-        [Fact]
-        public void DeleteMissing()
-        {
-            Assert.Throws<NotFoundException>(() => repository.Delete(missingId));
+            Assert.True(context.Messages.Find(message.Id).IsDeleted);
+            Assert.NotNull(context.Messages.Find(message.Id).DeletedOn);
         }
 
         [Fact]
@@ -48,35 +48,44 @@ namespace MessagesTests.Repository
         {
             const string updatedContent = "upContent";
             const string updatedName = "upName";
-            var result = repository.Update(message.Id, updatedName, updatedContent);
+            repository.Update(message, updatedName, updatedContent);
 
-            Assert.Equal(updatedName, result.Name);
-            Assert.Equal(updatedContent, result.Content);
-            Assert.Equal(updatedName, context.Messages.Find(result.Id).Name);
-            Assert.Equal(updatedContent, context.Messages.Find(result.Id).Content);
+            Assert.Equal(updatedName, message.Name);
+            Assert.Equal(updatedContent, message.Content);
+            Assert.Equal(updatedName, context.Messages.Find(message.Id).Name);
+            Assert.Equal(updatedContent, context.Messages.Find(message.Id).Content);
         }
 
         [Fact]
-        public void UpdateMissing()
+        public void Insert()
         {
-            const string updatedContent = "upContent";
-            const string updatedName = "upName";
-            
-            Assert.Throws<NotFoundException>(() => repository.Update(missingId, updatedName, updatedContent));
+            Message message = new() { Content = "content", Name = "name", CreationDate = DateTime.Now, Email = "Email", Id = Guid.NewGuid(), Username = "Username" };
+            repository.Insert(message);
+
+            Assert.True(context.Messages.Contains(message));
         }
 
         [Fact]
-        public void GetPosterUsernameByExistingId()
+        public void Restore()
         {
-            var result = repository.GetPosterUsernameById(message.Id);
+            repository.Restore(toRestore);
 
-            Assert.Equal(message.Username, result);
+            Assert.False(toRestore.IsDeleted);
+            Assert.Null(toRestore.DeletedOn);
         }
 
         [Fact]
-        public void GetPosterUsernameByMissingId()
+        public void GetByIdOfExisting()
         {
-            var result = repository.GetPosterUsernameById(missingId);
+            var result = repository.GetById(message.Id);
+
+            Assert.NotNull(result);
+        }
+
+        [Fact]
+        public void GetByIdOfMissing()
+        {
+            var result = repository.GetById(missingId);
 
             Assert.Null(result);
         }
