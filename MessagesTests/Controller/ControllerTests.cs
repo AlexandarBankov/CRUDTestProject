@@ -88,18 +88,6 @@ namespace MessagesTests.Controller
         }
 
         [Fact]
-        public void DeleteMessageOfSomeoneElse()
-        {
-            mockUserInController(fixture.message.Username + "notEmpty", string.Empty);
-
-            var response = controller.DeleteMessage(fixture.message.Id);
-
-            Assert.IsType<UnauthorizedObjectResult>(response);
-
-            fixture.Mock.Verify(m => m.Delete(It.IsAny<Guid>()), Times.Never);
-        }
-
-        [Fact]
         public void DeleteYourMessage()
         {
             mockUserInController(fixture.message.Username, string.Empty);
@@ -108,19 +96,7 @@ namespace MessagesTests.Controller
 
             Assert.IsType<OkResult>(response);
 
-            fixture.Mock.Verify(m => m.Delete(It.IsAny<Guid>()), Times.Once);
-        }
-
-        [Fact]
-        public void UpdateMessageOfSomeoneElse()
-        {
-            mockUserInController(fixture.message.Username + "notEmpty", string.Empty);
-
-            var response = controller.UpdateMessage(fixture.message.Id, new UpdateMessageDto() { Content = String.Empty, Name = String.Empty });
-
-            Assert.IsType<UnauthorizedObjectResult>(response);
-
-            fixture.Mock.Verify(m => m.Update(It.IsAny<Guid>(), string.Empty, string.Empty), Times.Never);
+            fixture.Mock.Verify(m => m.Delete(It.IsAny<Guid>(), fixture.message.Username), Times.Once);
         }
 
         [Fact]
@@ -132,7 +108,7 @@ namespace MessagesTests.Controller
 
             Assert.IsType<OkObjectResult>(response);
 
-            fixture.Mock.Verify(m => m.Update(It.IsAny<Guid>(), NAME, CONTENT), Times.Once);
+            fixture.Mock.Verify(m => m.Update(It.IsAny<Guid>(), NAME, CONTENT, fixture.message.Username), Times.Once);
 
             var result = response as OkObjectResult;
             Assert.Equal(StatusCodes.Status200OK, result.StatusCode);

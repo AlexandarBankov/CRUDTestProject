@@ -10,9 +10,12 @@ namespace CRUDTestProject.Services
         private IQueryable<Message> notDeleted => repository.Messages.Where(m => !m.IsDeleted);
         private IQueryable<Message> deleted => repository.Messages.Where(m => m.IsDeleted);
 
-        public void Delete(Guid id)
+        public void Delete(Guid id, string username)
         {
-            var message = notDeleted.Where(m => m.Id == id).FirstOrDefault() ?? throw new NotFoundException("Invalid message id for deletion.");
+            var message = notDeleted.Where(m => m.Id == id).FirstOrDefault() ?? throw new NotFoundException("Message for deletion not found.");
+            
+            if (message.Username != username) throw new DifferentUserException("You can delete only your own messages.");
+            
             repository.Delete(message);
         }
 
@@ -31,33 +34,25 @@ namespace CRUDTestProject.Services
             return deleted.AsNoTracking();
         }
 
-        public string? GetPosterUsernameById(Guid id)
-        {
-            var message = repository.GetById(id);
-
-            if (message is not null)
-            {
-                return message.Username;
-            }
-
-            return null;
-        }
-
         public void Insert(Message message)
         {
             repository.Insert(message);
         }
 
-        public void Restore(Guid id)
+        public void Restore(Guid id, string username)
         {
-            var message = deleted.Where(m => m.Id == id).FirstOrDefault() ?? throw new NotFoundException("Invalid message id for restoration.");
+            var message = deleted.Where(m => m.Id == id).FirstOrDefault() ?? throw new NotFoundException("Message for restoration not found.");
+
+            if (message.Username != username) throw new DifferentUserException("You can restore only your own messages.");
 
             repository.Restore(message);
         }
 
-        public Message Update(Guid id, string name, string content)
+        public Message Update(Guid id, string name, string content, string username)
         {
-            var message = notDeleted.Where(m => m.Id == id).FirstOrDefault() ?? throw new NotFoundException("Invalid message id for update.");
+            var message = notDeleted.Where(m => m.Id == id).FirstOrDefault() ?? throw new NotFoundException("Message for update not found.");
+
+            if (message.Username != username) throw new DifferentUserException("You can update only your own messages.");
 
             repository.Update(message, name, content);
 

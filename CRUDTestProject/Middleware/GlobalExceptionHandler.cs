@@ -19,6 +19,10 @@ namespace CRUDTestProject.Middleware
                     problemDetails.Status = StatusCodes.Status404NotFound;
                     problemDetails.Title = exception.Message;
                     break;
+                case DifferentUserException:
+                    problemDetails.Status = StatusCodes.Status401Unauthorized;
+                    problemDetails.Title = exception.Message;
+                    break;
                 default:
                     problemDetails.Status = StatusCodes.Status500InternalServerError;
                     problemDetails.Title = "Unexpected error";

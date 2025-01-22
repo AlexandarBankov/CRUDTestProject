@@ -11,10 +11,8 @@ namespace CRUDTestProject.Services
         Message? GetById(Guid id);
 
         void Insert(Message message);
-        Message Update(Guid id, string name, string content);
-        void Delete(Guid id);
-        void Restore(Guid id);
-
-        string? GetPosterUsernameById(Guid id);
+        Message Update(Guid id, string name, string content, string username);
+        void Delete(Guid id, string username);
+        void Restore(Guid id, string username);
     }
 }

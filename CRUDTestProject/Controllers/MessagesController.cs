@@ -12,6 +12,10 @@ namespace CRUDTestProject.Controllers
     [ApiController]
     public class MessagesController(IMessageHandler messageHandler) : ControllerBase
     {
+        //gets the username from the claims of an authorized user (null for an unauthorized user)
+        private string? username => User.FindFirstValue(ClaimTypes.Name);
+
+
         [HttpGet]
         public IActionResult GetMessagesPassingFilter(
             [FromQuery] MessageFilterParameters filterParameters,
@@ -59,7 +63,7 @@ namespace CRUDTestProject.Controllers
                 Name = addMessageDto.Name, 
                 Content = addMessageDto.Content,
                 CreationDate = DateTime.Now,
-                Username = User.FindFirstValue(ClaimTypes.Name),
+                Username = username,
                 Email = User.FindFirstValue(ClaimTypes.Email)
             };
 
@@ -73,14 +77,7 @@ namespace CRUDTestProject.Controllers
         [Route("{id:guid}")]
         public IActionResult UpdateMessage(Guid id, UpdateMessageDto updateMessageDto) 
         {
-            var posterUsername = messageHandler.GetPosterUsernameById(id);
-            
-            if (posterUsername != User.FindFirstValue(ClaimTypes.Name))
-            {
-                return Unauthorized("You can only update your own messages.");
-            }
-
-            Message message = messageHandler.Update(id, updateMessageDto.Name, updateMessageDto.Content);
+            Message message = messageHandler.Update(id, updateMessageDto.Name, updateMessageDto.Content, username);
             
             return Ok(new MessageResponseModel(message));
         }
@@ -90,12 +87,7 @@ namespace CRUDTestProject.Controllers
         [Route("{id:guid}")]
         public IActionResult DeleteMessage(Guid id) 
         {
-            var posterUsername = messageHandler.GetPosterUsernameById(id);
-            if (posterUsername != User.FindFirstValue(ClaimTypes.Name))
-            {
-                return Unauthorized("You can delete only your own posted messages.");
-            }
-            messageHandler.Delete(id);
+            messageHandler.Delete(id, username);
 
             return Ok();
         }
@@ -105,12 +97,7 @@ namespace CRUDTestProject.Controllers
         [Route("{id:guid}")]
         public IActionResult RestoreMessage(Guid id)
         {
-            var posterUsername = messageHandler.GetPosterUsernameById(id);
-            if (posterUsername != User.FindFirstValue(ClaimTypes.Name))
-            {
-                return Unauthorized("You can restore only your own posted messages.");
-            }
-            messageHandler.Restore(id);
+            messageHandler.Restore(id, username);
 
             return Ok();
         }
@@ -121,7 +108,7 @@ namespace CRUDTestProject.Controllers
         public IActionResult GetDeleted()
         {
             var messages = messageHandler.GetDeleted()
-                .Where(m => m.Username == User.FindFirstValue(ClaimTypes.Name));
+                .Where(m => m.Username == username);
 
             return Ok(messages.Select(m => new MessageResponseModel(m)));
         }
@@ -131,7 +118,7 @@ namespace CRUDTestProject.Controllers
         [Route("[action]")]
         public IActionResult GetUsername()
         {
-            var name = User.FindFirstValue(ClaimTypes.Name);
+            var name = username;
 
             return Ok(name);
         }
