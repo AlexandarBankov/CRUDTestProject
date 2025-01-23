@@ -1,7 +1,7 @@
 ﻿using CRUDTestProject.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace CRUDTestProject.Data
+namespace CRUDTestProject.Data.Repositories
 {
     public class MessageRepository(ApplicationDbContext dbContext) : IMessageRepository
     {
@@ -35,7 +35,7 @@ namespace CRUDTestProject.Data
         {
             message.Name = name;
             message.Content = content;
-            
+
             dbContext.SaveChanges();
         }
     }

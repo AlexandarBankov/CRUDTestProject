@@ -1,11 +1,11 @@
-﻿using CRUDTestProject.Data;
-using CRUDTestProject.Data.Entities;
+﻿using CRUDTestProject.Data.Entities;
+using CRUDTestProject.Data.Repositories;
 using CRUDTestProject.Middleware.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace CRUDTestProject.Services
 {
-    public class MessageHandler(IMessageRepository repository) : IMessageHandler
+    public class MessageHandler(IMessageRepository repository, IBadWordsHandler badWordsHandler) : IMessageHandler
     {
         private IQueryable<Message> notDeleted => repository.Messages.Where(m => !m.IsDeleted);
         private IQueryable<Message> deleted => repository.Messages.Where(m => m.IsDeleted);
@@ -36,6 +36,7 @@ namespace CRUDTestProject.Services
 
         public void Insert(Message message)
         {
+            badWordsHandler.CheckForBadWords([message.Name, message.Content]);
             repository.Insert(message);
         }
 

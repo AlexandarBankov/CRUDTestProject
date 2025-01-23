@@ -1,5 +1,6 @@
 ﻿using CRUDTestProject.Data;
 using CRUDTestProject.Data.Entities;
+using CRUDTestProject.Data.Repositories;
 using CRUDTestProject.Middleware.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

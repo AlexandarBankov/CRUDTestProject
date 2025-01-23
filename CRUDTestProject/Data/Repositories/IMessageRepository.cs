@@ -1,6 +1,6 @@
 ﻿using CRUDTestProject.Data.Entities;
 
-namespace CRUDTestProject.Data
+namespace CRUDTestProject.Data.Repositories
 {
     public interface IMessageRepository
     {

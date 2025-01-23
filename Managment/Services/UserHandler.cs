@@ -26,6 +26,11 @@ namespace Management.Services
                     new(ClaimTypes.Email, user.Email),
                     new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 };
+            var roles = await userManager.GetRolesAsync(user);
+            foreach (var role in roles)
+            {
+                authClaims.Add(new(ClaimTypes.Role, role));
+            }
 
             return GetToken(authClaims);
         }

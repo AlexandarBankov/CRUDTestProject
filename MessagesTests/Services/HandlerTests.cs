@@ -1,5 +1,5 @@
-﻿using CRUDTestProject.Data;
-using CRUDTestProject.Data.Entities;
+﻿using CRUDTestProject.Data.Entities;
+using CRUDTestProject.Data.Repositories;
 using CRUDTestProject.Middleware.Exceptions;
 using CRUDTestProject.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -23,7 +23,7 @@ namespace MessagesTests.Repository
             mockRepository.Setup(m => m.Messages).Returns(messages.AsQueryable());
             mockRepository.Setup(m => m.GetById(messages[0].Id)).Returns(messages[0]);
 
-            handler = new MessageHandler(mockRepository.Object);
+            handler = new MessageHandler(mockRepository.Object, Mock.Of<IBadWordsHandler>());
         }
 
         [Fact]
