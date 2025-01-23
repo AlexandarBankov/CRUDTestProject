@@ -25,6 +25,7 @@ namespace ManagementTests.Services
             var user = new User() { TenantId = "", Email = "", UserName = USERNAME };
             mockManager.Setup(m => m.FindByNameAsync(USERNAME)).ReturnsAsync(user);
             mockManager.Setup(m => m.CheckPasswordAsync(user, PASSWORD)).ReturnsAsync(true);
+            mockManager.Setup(m => m.GetRolesAsync(user)).ReturnsAsync([]);
 
             mockManager.Setup(m => m.CreateAsync(It.IsAny<User>(), It.IsAny<string>())).ReturnsAsync(IdentityResult.Success);
             
