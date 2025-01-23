@@ -3,6 +3,7 @@ using CRUDTestProject.Data.Entities;
 using CRUDTestProject.Models;
 using CRUDTestProject.Models.Response;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -22,6 +23,7 @@ namespace MessagesTests.Integration
         const string CONTENT = "1c";
         const string NAME = "1n";
         private Guid ID;
+        private Guid SoftDeletedID;
 
         private readonly HttpClient client;
         private readonly CustomWebApplicationFactory factory;
@@ -38,17 +40,34 @@ namespace MessagesTests.Integration
             ];
         }
 
+        private List<Message> getDeletedMessages()
+        {
+            return
+            [
+                new (){ Content = CONTENT, CreationDate = DateTime.Now.AddDays(-1), Email = EMAIL, Name = NAME, Username = USERNAME, IsDeleted = true, DeletedOn = DateTime.Now},
+                new (){ Content = "2c", CreationDate = DateTime.Now.AddDays(-2), Email = "2e", Name = "2n", Username = "2u", IsDeleted = true, DeletedOn = DateTime.Now},
+                new (){ Content = "3c", CreationDate = DateTime.Now.AddDays(-3), Email = "3e", Name = "3n", Username = "3u", IsDeleted = true, DeletedOn = DateTime.Now},
+                new (){ Content = "4c", CreationDate = DateTime.Now.AddDays(-4), Email = "4e", Name = "4n", Username = "4u", IsDeleted = true, DeletedOn = DateTime.Now},
+                new (){ Content = "5c", CreationDate = DateTime.Now.AddDays(-5), Email = "5e", Name = "5n", Username = "5u", IsDeleted = true, DeletedOn = DateTime.Now}
+            ];
+        }
+
         public MessageApiIntegrationTests(CustomWebApplicationFactory factory)
         {
             client = factory.CreateClient();
             using (var scope = factory.Services.CreateScope())
             {
-                var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                ApplicationDbContext context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+                context.RemoveRange(context.Messages);
+                context.SaveChanges();
                 context.RemoveRange(context.Messages);
                 context.UpdateRange(getMessages());
+                context.UpdateRange(getDeletedMessages());
                 context.SaveChanges();
 
-                ID = context.Messages.Where(m => m.Username == USERNAME).FirstOrDefault().Id;
+                ID = context.Messages.Where(m => m.Username == USERNAME && !m.IsDeleted).FirstOrDefault().Id;
+                SoftDeletedID = context.Messages.Where(m => m.Username == USERNAME && m.IsDeleted).FirstOrDefault().Id;
             }
 
             this.factory = factory;
@@ -75,7 +94,7 @@ namespace MessagesTests.Integration
             var result = await response.Content.ReadAsStringAsync();
             var messageList = JsonConvert.DeserializeObject<List<MessageResponseModel>>(result);
 
-            Assert.Equal(USERNAME, messageList.First().Username);
+            Assert.True(messageList.All(m => m.Username == USERNAME));
         }
 
         [Fact]
@@ -87,7 +106,7 @@ namespace MessagesTests.Integration
             var result = await response.Content.ReadAsStringAsync();
             var messageList = JsonConvert.DeserializeObject<List<MessageResponseModel>>(result);
 
-            Assert.Equal(CONTENT, messageList.Last().Content);
+            Assert.True(messageList.All(m => m.Content == CONTENT));
         }
 
         [Fact]
@@ -99,7 +118,7 @@ namespace MessagesTests.Integration
             var result = await response.Content.ReadAsStringAsync();
             var messageList = JsonConvert.DeserializeObject<List<MessageResponseModel>>(result);
 
-            Assert.Equal(NAME, messageList.Last().Name);
+            Assert.True(messageList.All(m => m.Name == NAME));
         }
 
         private string? GetToken(string username)
@@ -189,6 +208,9 @@ namespace MessagesTests.Integration
             var message = JsonConvert.DeserializeObject<MessageResponseModel>(result);
 
             Assert.Equal(ID, message.Id);
+            Assert.Equal(CONTENT, message.Content);
+            Assert.Equal(NAME, message.Name);
+            Assert.Equal(USERNAME, message.Username);
         }
 
         [Fact]
@@ -220,6 +242,52 @@ namespace MessagesTests.Integration
         public async Task DeleteMessageWhenNotLoggedIn()
         {
             var response = await client.DeleteAsync("/api/messages/" + ID);
+
+            Assert.Equal(StatusCodes.Status401Unauthorized, ((int)response.StatusCode));
+        }
+
+        [Fact]
+        public async Task RestoreYourMessageWhenLoggedIn()
+        {
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GetToken(USERNAME));
+            var response = await client.PatchAsync("/api/messages/" + SoftDeletedID, null);
+            response.EnsureSuccessStatusCode();
+        }
+
+        [Fact]
+        public async Task RestoreNotYourMessageWhenLoggedIn()
+        {
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GetToken(USERNAME + "notEmpty"));
+            var response = await client.PatchAsync("/api/messages/" + SoftDeletedID, null);
+
+            Assert.Equal(StatusCodes.Status401Unauthorized, ((int)response.StatusCode));
+        }
+
+        [Fact]
+        public async Task RestoreMessageWhenNotLoggedIn()
+        {
+            var response = await client.PatchAsync("/api/messages/" + SoftDeletedID, null);
+
+            Assert.Equal(StatusCodes.Status401Unauthorized, ((int)response.StatusCode));
+        }
+
+        [Fact]
+        public async Task GetDeletedMessagesWhenLoggedIn()
+        {
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GetToken(USERNAME));
+            var response = await client.GetAsync("/api/messages/GetDeleted");
+            response.EnsureSuccessStatusCode();
+
+            var result = await response.Content.ReadAsStringAsync();
+            var messageList = JsonConvert.DeserializeObject<List<MessageResponseModel>>(result);
+
+            Assert.Equal(getDeletedMessages().Where(m => m.Username == USERNAME).Count(), messageList.Count);
+        }
+
+        [Fact]
+        public async Task GetDeletedMessagesWhenNotLoggedIn()
+        {
+            var response = await client.GetAsync("/api/messages/GetDeleted");
 
             Assert.Equal(StatusCodes.Status401Unauthorized, ((int)response.StatusCode));
         }

@@ -1,38 +1,21 @@
 ﻿using CRUDTestProject.Data.Entities;
-using CRUDTestProject.Middleware.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace CRUDTestProject.Data
 {
     public class MessageRepository(ApplicationDbContext dbContext) : IMessageRepository
     {
-        public void Delete(Guid id)
+        public IQueryable<Message> Messages => dbContext.Messages;
+
+        public void Delete(Message message)
         {
-            var message = dbContext.Messages.Find(id) ?? throw new NotFoundException("Message with given id wasn't found.");
             dbContext.Messages.Remove(message);
             dbContext.SaveChanges();
         }
 
-        public IEnumerable<Message> GetAll()
-        {
-            return dbContext.Messages.AsNoTracking();
-        }
-
         public Message? GetById(Guid id)
         {
-            return dbContext.Messages.Where(m => m.Id == id).AsNoTracking().FirstOrDefault();
-        }
-
-        public string? GetPosterUsernameById(Guid id)
-        {
-            var message = this.GetById(id);
-
-            if (message is not null)
-            {
-                return message.Username;
-            }
-
-            return null;
+            return Messages.Where(m => m.Id == id).AsNoTracking().FirstOrDefault();
         }
 
         public void Insert(Message message)
@@ -41,15 +24,19 @@ namespace CRUDTestProject.Data
             dbContext.SaveChanges();
         }
 
-        public Message Update(Guid id, string name, string content)
+        public void Restore(Message message)
         {
-            var message = dbContext.Messages.Where(m => m.Id == id).FirstOrDefault() ?? throw new NotFoundException("Message with given id wasn't found so it cannot be updated.");
+            message.IsDeleted = false;
+            message.DeletedOn = null;
+            dbContext.SaveChanges();
+        }
+
+        public void Update(Message message, string name, string content)
+        {
             message.Name = name;
             message.Content = content;
             
             dbContext.SaveChanges();
-
-            return message;
         }
     }
 }

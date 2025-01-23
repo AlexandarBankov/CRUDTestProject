@@ -1,12 +1,12 @@
-﻿using CRUDTestProject.Data;
-using CRUDTestProject.Data.Entities;
+﻿using CRUDTestProject.Data.Entities;
+using CRUDTestProject.Services;
 using Moq;
 
 namespace MessagesTests.Controller
 {
     public class RepositoryFixture
     {
-        public Mock<IMessageRepository> Mock { get; private set; }
+        public Mock<IMessageHandler> Mock { get; private set; }
         public Guid ExistingId { get; private set; }
         public Guid MissingId { get; private set; }
 
@@ -34,11 +34,9 @@ namespace MessagesTests.Controller
             
             Mock.Setup(repository => repository.Insert(It.IsAny<Message>()));
 
-            Mock.Setup(repository => repository.Delete(It.IsAny<Guid>()));
-
-            Mock.Setup(repository => repository.GetPosterUsernameById(ExistingId)).Returns(message.Name);
+            Mock.Setup(repository => repository.Delete(It.IsAny<Guid>(), It.IsAny<string>()));
             
-            Mock.Setup(repository => repository.Update(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>())).Returns(message);
+            Mock.Setup(repository => repository.Update(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(message);
         }
     }
 }
