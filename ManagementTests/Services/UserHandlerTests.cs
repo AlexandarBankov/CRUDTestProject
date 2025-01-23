@@ -25,7 +25,7 @@ namespace ManagementTests.Services
             var user = new User() { TenantId = "", Email = "", UserName = USERNAME };
             mockManager.Setup(m => m.FindByNameAsync(USERNAME)).ReturnsAsync(user);
             mockManager.Setup(m => m.CheckPasswordAsync(user, PASSWORD)).ReturnsAsync(true);
-            mockManager.Setup(m => m.GetRolesAsync(user)).ReturnsAsync([]);
+            mockManager.Setup(m => m.GetRolesAsync(user)).ReturnsAsync(["Admin"]);
 
             mockManager.Setup(m => m.CreateAsync(It.IsAny<User>(), It.IsAny<string>())).ReturnsAsync(IdentityResult.Success);
             
@@ -43,6 +43,7 @@ namespace ManagementTests.Services
             var token = await userHandler.Authenticate(new LoginUserModel() { Password = PASSWORD, Username = USERNAME });
 
             Assert.Equal(USERNAME, token.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name).Value);
+            Assert.Contains(token.Claims, c => c.Type == ClaimTypes.Role && c.Value == "Admin");
         }
 
         [Fact]
