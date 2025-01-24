@@ -1,5 +1,6 @@
 using Cronos;
 using CRUDTestProject.Data;
+using CRUDTestProject.Data.Repositories;
 using CRUDTestProject.Middleware;
 using CRUDTestProject.Scheduling;
 using CRUDTestProject.Services;
@@ -52,6 +53,8 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IMessageHandler, MessageHandler>();
+builder.Services.AddScoped<IBadWordsRepository, BadWordsRepository>();
+builder.Services.AddScoped<IBadWordsHandler, BadWordsHandler>();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();

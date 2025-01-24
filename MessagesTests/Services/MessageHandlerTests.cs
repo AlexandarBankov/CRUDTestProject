@@ -1,5 +1,5 @@
-﻿using CRUDTestProject.Data;
-using CRUDTestProject.Data.Entities;
+﻿using CRUDTestProject.Data.Entities;
+using CRUDTestProject.Data.Repositories;
 using CRUDTestProject.Middleware.Exceptions;
 using CRUDTestProject.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -8,22 +8,42 @@ using Moq;
 
 namespace MessagesTests.Repository
 {
-    public class HandlerTests
+    public class MessageHandlerTests
     {
         private IMessageHandler handler;
         Mock<IMessageRepository> mockRepository;
+        Mock<IBadWordsHandler> mockBadWords;
 
         private List<Message> messages = [new() { Content = "Content", CreationDate = DateTime.Now, Email = "Email", Name = "Name", Username = "Username", Id = Guid.NewGuid() },
                                           new() { Content = "Content", CreationDate = DateTime.Now, Email = "Email", Name = "Name", Username = "Username", Id = Guid.NewGuid() , IsDeleted = true}];
+        private Message withoutBadWords = new() { Content = "Content", CreationDate = DateTime.Now, Email = "Email", Name = "Name", Username = "Username", Id = Guid.NewGuid() };
+        private Message withBadWords = new() { Content = "ContentBADDDDDDDDDD", CreationDate = DateTime.Now, Email = "Email", Name = "Name", Username = "Username", Id = Guid.NewGuid() };
         private readonly Guid missingId = Guid.NewGuid();
-        public HandlerTests()
+        public MessageHandlerTests()
         {
+            mockBadWords = new();
             mockRepository = new();
 
             mockRepository.Setup(m => m.Messages).Returns(messages.AsQueryable());
             mockRepository.Setup(m => m.GetById(messages[0].Id)).Returns(messages[0]);
 
-            handler = new MessageHandler(mockRepository.Object);
+            mockBadWords.Setup(m => m.CheckForBadWords(new List<string>() { withBadWords.Name, withBadWords.Content })).Throws(new BadWordException(""));
+
+            handler = new MessageHandler(mockRepository.Object, mockBadWords.Object);
+        }
+
+        [Fact]
+        public void AddMessageWithoutBadWords()
+        {
+            handler.Insert(withoutBadWords);
+
+            mockRepository.Verify(m => m.Insert(withoutBadWords), Times.Once);
+        }
+
+        [Fact]
+        public void AddMessageWithBadWords()
+        {
+            Assert.Throws<BadWordException>(() => handler.Insert(withBadWords));
         }
 
         [Fact]

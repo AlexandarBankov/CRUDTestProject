@@ -1,12 +1,13 @@
 ﻿using CRUDTestProject.Data;
 using CRUDTestProject.Data.Entities;
+using CRUDTestProject.Data.Repositories;
 using CRUDTestProject.Middleware.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MessagesTests.Repository
 {
-    public class RepositoryTests
+    public class MessageRepositoryTests
     {
         private IMessageRepository repository;
         private DbContextOptions<ApplicationDbContext> options;
@@ -14,7 +15,7 @@ namespace MessagesTests.Repository
         private Message message = new() { Content = "Content", CreationDate = DateTime.Now, Email = "Email", Name = "Name", Username = "Username", Id = Guid.NewGuid() };
         private Message toRestore = new() { Content = "Content", CreationDate = DateTime.Now.AddDays(-5), Email = "Email", Name = "Name", Username = "Username", Id = Guid.NewGuid() , DeletedOn = DateTime.Now, IsDeleted = true};
         private readonly Guid missingId = Guid.NewGuid();
-        public RepositoryTests()
+        public MessageRepositoryTests()
         {
 
             options = new DbContextOptionsBuilder<ApplicationDbContext>()
