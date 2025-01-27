@@ -55,6 +55,7 @@ namespace CRUDTestProject.Services
 
             if (message.Username != username) throw new DifferentUserException("You can update only your own messages.");
 
+            badWordsHandler.CheckForBadWords([name, content]);
             repository.Update(message, name, content);
 
             return message;

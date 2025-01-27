@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Management.Middleware;
 using Management.Services;
+using Refit;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,6 +59,10 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]))
     };
 });
+
+builder.Services
+    .AddRefitClient<IMessagesApi>( new RefitSettings() { AuthorizationHeaderValueGetter = (rq, ct) => ApiTokenGenerator.GetTokenForMessages(configuration)} )
+    .ConfigureHttpClient(c => c.BaseAddress = new Uri(configuration["MessagesApiLink"]));
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
