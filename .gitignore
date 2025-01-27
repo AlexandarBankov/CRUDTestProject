@@ -367,3 +367,6 @@ FodyWeavers.xsd
 /Managment/appsettings.json
 /Managment/appsettings.Development.json
 /Managment/Properties/launchSettings.json
+/Managment/appsettings.json
+/Managment/Properties/launchSettings.json
+/Managment/appsettings.Development.json
