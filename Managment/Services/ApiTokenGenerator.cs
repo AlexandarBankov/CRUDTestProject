@@ -10,7 +10,7 @@ namespace Management.Services
     {
         public static Task<string> GetTokenForMessages(IConfiguration configuration)
         {
-            List<Claim> authClaims = [new (Constants.ServiceClaimType, "Management")];
+            List<Claim> authClaims = [new (Constants.ServiceClaimType, Constants.ManagementServiceName)];
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]));
 
             var token = new JwtSecurityToken(

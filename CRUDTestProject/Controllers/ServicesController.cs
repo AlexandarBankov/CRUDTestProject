@@ -1,6 +1,7 @@
 ﻿using CRUDTestProject.Services;
 using CRUDTestProject.Services.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SharedLibrary;
 
 namespace CRUDTestProject.Controllers
 {
@@ -9,7 +10,7 @@ namespace CRUDTestProject.Controllers
     public class ServicesController(IBulkMessagesHandler handler) : ControllerBase
     {
         [HttpPatch]
-        [ServiceAuthorization("Management")]
+        [ServiceAuthorization(Constants.ManagementServiceName)]
         [Route("[action]")]
         public IActionResult RenameUser(string oldUsername, string newUsername)
         {
@@ -18,7 +19,7 @@ namespace CRUDTestProject.Controllers
         }
 
         [HttpDelete]
-        [ServiceAuthorization("Management")]
+        [ServiceAuthorization(Constants.ManagementServiceName)]
         [Route("[action]/{username}")]
         public IActionResult DeleteUserMessages(string username)
         {

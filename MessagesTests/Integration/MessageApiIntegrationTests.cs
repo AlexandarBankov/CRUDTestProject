@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using SharedLibrary;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -124,13 +125,18 @@ namespace MessagesTests.Integration
             Assert.True(messageList.All(m => m.Name == NAME));
         }
 
-        private string? GetToken(string username, bool isAdmin = false)
+        private string? GetToken(string username, bool isAdmin = false, bool isManagement = false)
         {
             List<Claim> authClaims = new List<Claim>() { new Claim(ClaimTypes.Name, username), new Claim(ClaimTypes.Email, EMAIL) };
 
             if (isAdmin)
             {
                 authClaims.Add(new(ClaimTypes.Role, "Admin"));
+            }
+
+            if (isManagement)
+            {
+                authClaims.Add(new(Constants.ServiceClaimType, Constants.ManagementServiceName));
             }
 
             var configuration = factory.Services.CreateScope().ServiceProvider.GetRequiredService<IConfiguration>();
@@ -355,6 +361,58 @@ namespace MessagesTests.Integration
             var response = await client.DeleteAsync("/api/BadWords?badWord=" + Guid.NewGuid().ToString());
 
             Assert.Equal(StatusCodes.Status404NotFound, ((int)response.StatusCode));
+        }
+
+        [Fact]
+        public async Task DeleteUserMessagesWhenAuthorized()
+        {
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GetToken(USERNAME, false, true));
+            var response = await client.DeleteAsync("/api/services/DeleteUserMessages/username");
+
+            response.EnsureSuccessStatusCode();
+        }
+
+        [Fact]
+        public async Task DeleteUserMessagesWhenNotAuthorized()
+        {
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GetToken(USERNAME));
+            var response = await client.DeleteAsync("/api/services/DeleteUserMessages/username");
+
+            Assert.Equal(StatusCodes.Status403Forbidden, ((int)response.StatusCode));
+        }
+
+        [Fact]
+        public async Task DeleteUserMessagesWhenNotAuthenticated()
+        {
+            var response = await client.DeleteAsync("/api/services/DeleteUserMessages/username");
+
+            Assert.Equal(StatusCodes.Status403Forbidden, ((int)response.StatusCode));
+        }
+
+        [Fact]
+        public async Task RenameUserMessagesWhenAuthorized()
+        {
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GetToken(USERNAME, false, true));
+            var response = await client.PatchAsync($"/api/services/RenameUser?oldUsername={USERNAME}&newUsername=newUsername", null);
+
+            response.EnsureSuccessStatusCode();
+        }
+
+        [Fact]
+        public async Task RenameUserMessagesWhenNotAuthorized()
+        {
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GetToken(USERNAME));
+            var response = await client.PatchAsync("/api/services/RenameUser?oldUsername=oldUsername&newUsername=newUsername", null);
+
+            Assert.Equal(StatusCodes.Status403Forbidden, ((int)response.StatusCode));
+        }
+
+        [Fact]
+        public async Task RenameUserMessagesWhenNotAuthenticated()
+        {
+            var response = await client.PatchAsync("/api/services/RenameUser?oldUsername=oldUsername&newUsername=newUsername", null);
+
+            Assert.Equal(StatusCodes.Status403Forbidden, ((int)response.StatusCode));
         }
     }
 }

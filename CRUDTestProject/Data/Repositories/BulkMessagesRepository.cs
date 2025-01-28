@@ -6,7 +6,8 @@ namespace CRUDTestProject.Data.Repositories
     {
         public void DeleteUserMessages(string username)
         {
-            dbContext.Messages.Where(m => m.Username == username).ExecuteDelete();
+            dbContext.RemoveRange(dbContext.Messages.Where(m => m.Username == username));
+            _ = dbContext.SaveChangesAsync().Result;
         }
 
         public void RenameUser(string oldUsername, string newUsername)

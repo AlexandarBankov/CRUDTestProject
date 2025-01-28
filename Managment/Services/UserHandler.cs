@@ -60,8 +60,9 @@ namespace Management.Services
 
             if (!response.IsSuccessStatusCode)
             {
-                logger.LogError($"The request about user '{username}' to the messages api failed.");
-                return;
+                var message = $"The request about user '{username}' to the messages api failed.";
+                logger.LogError(message);
+                throw new ApiCallFailedException(message);
             }
 
             await userManager.DeleteAsync(user);
