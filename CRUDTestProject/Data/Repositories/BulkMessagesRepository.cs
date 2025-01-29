@@ -4,10 +4,10 @@ namespace CRUDTestProject.Data.Repositories
 {
     public class BulkMessagesRepository(ApplicationDbContext dbContext) : IBulkMessagesRepository
     {
-        public void DeleteUserMessages(string username)
+        public async Task DeleteUserMessages(string username)
         {
             dbContext.RemoveRange(dbContext.Messages.Where(m => m.Username == username));
-            _ = dbContext.SaveChangesAsync().Result;
+            await dbContext.SaveChangesAsync();
         }
 
         public void RenameUser(string oldUsername, string newUsername)

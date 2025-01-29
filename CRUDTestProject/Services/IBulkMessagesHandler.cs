@@ -2,7 +2,7 @@
 {
     public interface IBulkMessagesHandler
     {
-        void RenameUser(string oldUsername, string newUsername);
-        void DeleteUserMessages(string username);
+        Task RenameUser(string oldUsername, string newUsername);
+        Task DeleteUserMessages(string username);
     }
 }

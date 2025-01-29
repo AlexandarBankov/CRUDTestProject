@@ -4,14 +4,14 @@ namespace CRUDTestProject.Services
 {
     public class BulkMessagesHandler(IBulkMessagesRepository repository, ILogger<BulkMessagesHandler> logger) : IBulkMessagesHandler
     {
-        public void DeleteUserMessages(string username)
+        public async Task DeleteUserMessages(string username)
         {
             logger.LogInformation($"Deleting the messages of {username}");
 
-            repository.DeleteUserMessages(username);
+            await repository.DeleteUserMessages(username);
         }
 
-        public void RenameUser(string oldUsername, string newUsername)
+        public async Task RenameUser(string oldUsername, string newUsername)
         {
             logger.LogInformation($"Renaming {oldUsername} to {newUsername}");
 
