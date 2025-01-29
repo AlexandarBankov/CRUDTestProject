@@ -1,9 +1,11 @@
 using Cronos;
 using CRUDTestProject.Data;
 using CRUDTestProject.Data.Repositories;
+using CRUDTestProject.Data.Repositories.Implementation;
 using CRUDTestProject.Middleware;
 using CRUDTestProject.Scheduling;
 using CRUDTestProject.Services;
+using CRUDTestProject.Services.Implementation;
 using EasyCronJob.Core;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;

@@ -1,7 +1,7 @@
 ﻿using CRUDTestProject.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace CRUDTestProject.Data.Repositories
+namespace CRUDTestProject.Data.Repositories.Implementation
 {
     public class BadWordsRepository(ApplicationDbContext dbContext) : IBadWordsRepository
     {

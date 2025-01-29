@@ -2,14 +2,14 @@
 using CRUDTestProject.Data.Repositories;
 using CRUDTestProject.Middleware.Exceptions;
 
-namespace CRUDTestProject.Services
+namespace CRUDTestProject.Services.Implementation
 {
     public class BadWordsHandler(IBadWordsRepository repository) : IBadWordsHandler
     {
         public void AddRange(IEnumerable<string> badWords)
         {
             var toAdd = badWords.Where(w => repository.BadWords.FirstOrDefault(bw => bw.Word == w) is null);
-            repository.AddRange(toAdd.Select(w => new BadWord() { Word = w })); 
+            repository.AddRange(toAdd.Select(w => new BadWord() { Word = w }));
         }
 
         public void CheckForBadWords(IEnumerable<string> toCheck)

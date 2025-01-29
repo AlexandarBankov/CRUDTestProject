@@ -3,7 +3,7 @@ using CRUDTestProject.Data.Repositories;
 using CRUDTestProject.Middleware.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
-namespace CRUDTestProject.Services
+namespace CRUDTestProject.Services.Implementation
 {
     public class MessageHandler(IMessageRepository repository, IBadWordsHandler badWordsHandler) : IMessageHandler
     {
@@ -13,9 +13,9 @@ namespace CRUDTestProject.Services
         public void Delete(Guid id, string username)
         {
             var message = notDeleted.Where(m => m.Id == id).FirstOrDefault() ?? throw new NotFoundException("Message for deletion not found.");
-            
+
             if (message.Username != username) throw new DifferentUserException("You can delete only your own messages.");
-            
+
             repository.Delete(message);
         }
 

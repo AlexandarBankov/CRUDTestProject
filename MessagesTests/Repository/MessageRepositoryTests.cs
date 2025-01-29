@@ -1,9 +1,8 @@
 ﻿using CRUDTestProject.Data;
 using CRUDTestProject.Data.Entities;
 using CRUDTestProject.Data.Repositories;
-using CRUDTestProject.Middleware.Exceptions;
+using CRUDTestProject.Data.Repositories.Implementation;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace MessagesTests.Repository
 {

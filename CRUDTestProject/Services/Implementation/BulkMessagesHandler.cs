@@ -1,6 +1,6 @@
 ﻿using CRUDTestProject.Data.Repositories;
 
-namespace CRUDTestProject.Services
+namespace CRUDTestProject.Services.Implementation
 {
     public class BulkMessagesHandler(IBulkMessagesRepository repository, ILogger<BulkMessagesHandler> logger) : IBulkMessagesHandler
     {
