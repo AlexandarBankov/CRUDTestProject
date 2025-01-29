@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using CRUDTestProject.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CRUDTestProject.Controllers
@@ -6,22 +7,22 @@ namespace CRUDTestProject.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles ="Admin")]
-    public class BackupsController : ControllerBase
+    public class BackupsController(IBackupHandler handler) : ControllerBase
     {
         [HttpPost]
         [Route("[action]")]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-
+            await handler.Create();
             return Ok();
         }
 
         [HttpGet]
         [Route("[action]")]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
-
-            return Ok();
+            var results = await handler.GetNames();
+            return Ok(results);
         }
     }
 }

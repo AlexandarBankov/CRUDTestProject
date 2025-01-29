@@ -59,6 +59,8 @@ builder.Services.AddScoped<IBadWordsRepository, BadWordsRepository>();
 builder.Services.AddScoped<IBadWordsHandler, BadWordsHandler>();
 builder.Services.AddScoped<IBulkMessagesRepository, BulkMessagesRepository>();
 builder.Services.AddScoped<IBulkMessagesHandler, BulkMessagesHandler>();
+builder.Services.AddScoped<IBackupRepository, BackupRepository>();
+builder.Services.AddScoped<IBackupHandler, BackupHandler>();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
