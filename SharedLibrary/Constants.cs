@@ -7,5 +7,8 @@
         
         public const int EmailMaxLength = 256;
         public const int UsernameMaxLength = 256;
+
+        public const string ServiceClaimType = "SourceService";
+        public const string ManagementServiceName = "Management";
     }
 }

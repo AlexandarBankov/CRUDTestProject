@@ -23,7 +23,15 @@ namespace Management.Middleware
                     problemDetails.Status = StatusCodes.Status401Unauthorized;
                     problemDetails.Title = exception.Message;
                     break;
+                case UnauthorizedException:
+                    problemDetails.Status = StatusCodes.Status401Unauthorized;
+                    problemDetails.Title = exception.Message;
+                    break;
                 case UserCreationException:
+                    problemDetails.Status = StatusCodes.Status500InternalServerError;
+                    problemDetails.Title = exception.Message;
+                    break;
+                case ApiCallFailedException:
                     problemDetails.Status = StatusCodes.Status500InternalServerError;
                     problemDetails.Title = exception.Message;
                     break;

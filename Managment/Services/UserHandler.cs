@@ -1,8 +1,10 @@
-﻿using Management.Data.Entities;
+﻿using Azure;
+using Management.Data.Entities;
 using Management.Middleware.Exceptions;
 using Management.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Refit;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -10,7 +12,9 @@ using System.Text;
 namespace Management.Services
 {
     public class UserHandler(UserManager<User> userManager,
-        IConfiguration configuration) : IUserHandler
+        IConfiguration configuration,
+        IMessagesApi messagesApi,
+        ILogger<UserHandler> logger) : IUserHandler
     {
         public async Task<JwtSecurityToken> Authenticate(LoginUserModel model)
         {
@@ -33,6 +37,35 @@ namespace Management.Services
             }
 
             return GetToken(authClaims);
+        }
+
+        public async Task Ban(string username, bool removeMessages)
+        {
+            var user = await userManager.FindByNameAsync(username) ?? throw new NoSuchUserException($"User with username '{username}' wasn't found.");
+
+            if (await userManager.IsInRoleAsync(user, "Admin")) throw new UnauthorizedException($"{username} is an admin, they cannot be banned.");
+
+            ApiResponse<object>? response;
+
+            if (removeMessages)
+            {
+                response = await messagesApi.DeleteUserMessages(username);
+            }
+            else
+            {
+                string newName = $"[Banned]_({user.Id})";
+
+                response = await messagesApi.RenameUser(username, newName);
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var message = $"The request about user '{username}' to the messages api failed.";
+                logger.LogError(message);
+                throw new ApiCallFailedException(message);
+            }
+
+            await userManager.DeleteAsync(user);
         }
 
         public async Task Create(RegisterUserModel model)

@@ -6,6 +6,7 @@ namespace Management.Services
     public interface IUserHandler
     {
         public Task Create(RegisterUserModel model);
+        public Task Ban(string username, bool removeMessages);
         public Task<JwtSecurityToken> Authenticate(LoginUserModel model);
     }
 }
