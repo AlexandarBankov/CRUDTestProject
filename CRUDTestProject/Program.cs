@@ -1,4 +1,3 @@
-using Cronos;
 using CRUDTestProject.Data;
 using CRUDTestProject.Data.Repositories;
 using CRUDTestProject.Data.Repositories.Implementation;
@@ -68,6 +67,13 @@ builder.Services.AddProblemDetails();
 builder.Services.ApplyResulation<RemoveOldSoftDeletedMessages>(options => 
 {
     options.CronExpression = "0 2 * * *"; // every day at 02:00 AM
+    options.TimeZoneInfo = TimeZoneInfo.Local;
+    options.CronFormat = Cronos.CronFormat.Standard;
+});
+
+builder.Services.ApplyResulation<BackupMessagesDb>(options =>
+{
+    options.CronExpression = "0 4 1 */3 *"; // on the 1st day of the month every 3 months at 04:00 AM
     options.TimeZoneInfo = TimeZoneInfo.Local;
     options.CronFormat = Cronos.CronFormat.Standard;
 });
