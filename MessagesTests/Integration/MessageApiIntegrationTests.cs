@@ -322,7 +322,7 @@ namespace MessagesTests.Integration
         public async Task AddBadWordWhenNotAdmin()
         {
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GetToken(USERNAME));
-            var response = await client.PostAsJsonAsync("/api/BadWords", new List<string>() { ""});
+            var response = await client.PostAsJsonAsync("/api/Admin/AddBadWords", new List<string>() { "" });
 
             Assert.Equal(StatusCodes.Status403Forbidden, ((int)response.StatusCode));
         }
@@ -331,7 +331,7 @@ namespace MessagesTests.Integration
         public async Task AddBadWordWhenAdmin()
         {
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GetToken(USERNAME, true));
-            var response = await client.PostAsJsonAsync("/api/BadWords", new List<string>() { "" });
+            var response = await client.PostAsJsonAsync("/api/Admin/AddBadWords", new List<string>() { "" });
 
             response.EnsureSuccessStatusCode();
         }
@@ -340,7 +340,7 @@ namespace MessagesTests.Integration
         public async Task RemoveBadWordWhenNotAdmin()
         {
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GetToken(USERNAME));
-            var response = await client.DeleteAsync("/api/BadWords?badWord=" + BADWORD);
+            var response = await client.DeleteAsync("/api/Admin/RemoveBadWord?badWord=" + BADWORD);
 
             Assert.Equal(StatusCodes.Status403Forbidden, ((int)response.StatusCode));
         }
@@ -349,7 +349,7 @@ namespace MessagesTests.Integration
         public async Task RemoveExistingBadWordWhenAdmin()
         {
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GetToken(USERNAME, true));
-            var response = await client.DeleteAsync("/api/BadWords?badWord=" + BADWORD);
+            var response = await client.DeleteAsync("/api/Admin/RemoveBadWord?badWord=" + BADWORD);
 
             response.EnsureSuccessStatusCode();
         }
