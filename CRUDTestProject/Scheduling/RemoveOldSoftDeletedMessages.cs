@@ -1,8 +1,6 @@
-﻿using Cronos;
-using CRUDTestProject.Data;
+﻿using CRUDTestProject.Data;
 using EasyCronJob.Abstractions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace CRUDTestProject.Scheduling
 {
@@ -30,21 +28,18 @@ namespace CRUDTestProject.Scheduling
             logger.LogInformation($"Removing messages that have been soft deleted for more than {DAYS} days. Start Time : {DateTime.Now}");
             try
             {
-                using (var scope = serviceProvider.CreateScope())
-                {
+                using var scope = serviceProvider.CreateScope();
 
-                    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-                    DateTime removeBefore = DateTime.Now - TimeSpan.FromDays(DAYS);
+                DateTime removeBefore = DateTime.Now - TimeSpan.FromDays(DAYS);
 
-                    var affected = dbContext.Messages.Where(m => m.IsDeleted)
-                                    .Where(m => m.DeletedOn < removeBefore).ExecuteDelete();
+                var affected = dbContext.Messages.Where(m => m.IsDeleted)
+                                .Where(m => m.DeletedOn < removeBefore).ExecuteDelete();
 
-                    logger.LogInformation("Removed: " + affected + " old soft deleted messages");
-
-                }
+                logger.LogInformation($"Removed: {affected} old soft deleted messages");
             }
-            catch (Exception e) 
+            catch (Exception e)
             {
                 logger.LogError(e, "Unexpected error in RemoveOldSoftDeletedMessages");
             }

@@ -1,6 +1,5 @@
 ﻿using CRUDTestProject.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CRUDTestProject.Controllers
@@ -23,7 +22,7 @@ namespace CRUDTestProject.Controllers
         public IActionResult RemoveBadWord(string badWord)
         {
             badWordsHandler.Remove(badWord);
-            return Ok();
+            return NoContent();
         }
 
         [HttpPost]

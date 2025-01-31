@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace CRUDTestProject.Data.Repositories.Implementation
+﻿namespace CRUDTestProject.Data.Repositories.Implementation
 {
     public class BulkMessagesRepository(ApplicationDbContext dbContext) : IBulkMessagesRepository
     {

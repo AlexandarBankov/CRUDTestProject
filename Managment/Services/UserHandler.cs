@@ -1,5 +1,4 @@
-﻿using Azure;
-using Management.Data.Entities;
+﻿using Management.Data.Entities;
 using Management.Middleware.Exceptions;
 using Management.Models;
 using Microsoft.AspNetCore.Identity;

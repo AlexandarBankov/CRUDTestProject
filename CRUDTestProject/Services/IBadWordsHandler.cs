@@ -1,6 +1,4 @@
-﻿using CRUDTestProject.Data.Entities;
-
-namespace CRUDTestProject.Services
+﻿namespace CRUDTestProject.Services
 {
     public interface IBadWordsHandler
     {

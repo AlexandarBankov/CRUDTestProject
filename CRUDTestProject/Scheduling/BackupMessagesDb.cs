@@ -24,15 +24,13 @@ namespace CRUDTestProject.Scheduling
         public override Task DoWork(CancellationToken cancellationToken)
         {
             logger.LogInformation($"Backing up the messages database. Start Time : {DateTime.Now}");
-            
+
             try
             {
-                using (var scope = serviceProvider.CreateScope())
-                {
-                    var handler = scope.ServiceProvider.GetRequiredService<IBackupHandler>();
+                using var scope = serviceProvider.CreateScope();
+                var handler = scope.ServiceProvider.GetRequiredService<IBackupHandler>();
 
-                    handler.Create().Wait();
-                }
+                handler.Create().Wait();
             }
             catch (Exception e)
             {

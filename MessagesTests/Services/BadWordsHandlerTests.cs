@@ -16,7 +16,7 @@ namespace MessagesTests.Services
         private readonly string MISSING = Guid.NewGuid().ToString();
         public BadWordsHandlerTests()
         {
-            badWords = [new() { Word = BADWORD}];
+            badWords = [new() { Word = BADWORD }];
             mockRepository = new();
 
             mockRepository.Setup(m => m.BadWords).Returns(badWords);
@@ -25,7 +25,7 @@ namespace MessagesTests.Services
         }
 
         [Fact]
-        public void CheckForBadWordsShouldThrowOnBadWord() 
+        public void CheckForBadWordsShouldThrowOnBadWord()
         {
             Assert.Throws<BadWordException>(() => handler.CheckForBadWords([BADWORD]));
         }

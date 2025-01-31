@@ -10,9 +10,9 @@ namespace MessagesTests.Repository
     {
         private IMessageRepository repository;
         private DbContextOptions<ApplicationDbContext> options;
-        private ApplicationDbContext context; 
+        private ApplicationDbContext context;
         private Message message = new() { Content = "Content", CreationDate = DateTime.Now, Email = "Email", Name = "Name", Username = "Username", Id = Guid.NewGuid() };
-        private Message toRestore = new() { Content = "Content", CreationDate = DateTime.Now.AddDays(-5), Email = "Email", Name = "Name", Username = "Username", Id = Guid.NewGuid() , DeletedOn = DateTime.Now, IsDeleted = true};
+        private Message toRestore = new() { Content = "Content", CreationDate = DateTime.Now.AddDays(-5), Email = "Email", Name = "Name", Username = "Username", Id = Guid.NewGuid(), DeletedOn = DateTime.Now, IsDeleted = true };
         private readonly Guid missingId = Guid.NewGuid();
         public MessageRepositoryTests()
         {
@@ -35,7 +35,7 @@ namespace MessagesTests.Repository
         }
 
         [Fact]
-        public void DeleteExisting() 
+        public void DeleteExisting()
         {
             repository.Delete(message);
 

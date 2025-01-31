@@ -64,7 +64,7 @@ builder.Services.AddScoped<IBackupHandler, BackupHandler>();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
-builder.Services.ApplyResulation<RemoveOldSoftDeletedMessages>(options => 
+builder.Services.ApplyResulation<RemoveOldSoftDeletedMessages>(options =>
 {
     options.CronExpression = "0 2 * * *"; // every day at 02:00 AM
     options.TimeZoneInfo = TimeZoneInfo.Local;

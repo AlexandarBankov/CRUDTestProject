@@ -50,11 +50,11 @@ namespace MessagesTests.Controller
 
             var message = result.Value as MessageResponseModel;
 
-            Assert.Equal(fixture.message.Name, message.Name);
-            Assert.Equal(fixture.message.Content, message.Content);
-            Assert.Equal(fixture.message.Username, message.Username);
-            Assert.Equal(fixture.message.Id, message.Id);
-            Assert.Equal(fixture.message.CreationDate, message.CreationDate);
+            Assert.Equal(fixture.Message.Name, message.Name);
+            Assert.Equal(fixture.Message.Content, message.Content);
+            Assert.Equal(fixture.Message.Username, message.Username);
+            Assert.Equal(fixture.Message.Id, message.Id);
+            Assert.Equal(fixture.Message.CreationDate, message.CreationDate);
         }
 
         [Fact]
@@ -90,25 +90,25 @@ namespace MessagesTests.Controller
         [Fact]
         public void DeleteYourMessage()
         {
-            mockUserInController(fixture.message.Username, string.Empty);
+            mockUserInController(fixture.Message.Username, string.Empty);
 
-            var response = controller.DeleteMessage(fixture.message.Id);
+            var response = controller.DeleteMessage(fixture.Message.Id);
 
-            Assert.IsType<OkResult>(response);
+            Assert.IsType<NoContentResult>(response);
 
-            fixture.Mock.Verify(m => m.Delete(It.IsAny<Guid>(), fixture.message.Username), Times.Once);
+            fixture.Mock.Verify(m => m.Delete(It.IsAny<Guid>(), fixture.Message.Username), Times.Once);
         }
 
         [Fact]
         public void UpdateYourMessage()
         {
-            mockUserInController(fixture.message.Username, string.Empty);
+            mockUserInController(fixture.Message.Username, string.Empty);
 
-            var response = controller.UpdateMessage(fixture.message.Id, new UpdateMessageDto() { Content = CONTENT, Name = NAME });
+            var response = controller.UpdateMessage(fixture.Message.Id, new UpdateMessageDto() { Content = CONTENT, Name = NAME });
 
             Assert.IsType<OkObjectResult>(response);
 
-            fixture.Mock.Verify(m => m.Update(It.IsAny<Guid>(), NAME, CONTENT, fixture.message.Username), Times.Once);
+            fixture.Mock.Verify(m => m.Update(It.IsAny<Guid>(), NAME, CONTENT, fixture.Message.Username), Times.Once);
 
             var result = response as OkObjectResult;
             Assert.Equal(StatusCodes.Status200OK, result.StatusCode);

@@ -7,9 +7,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Data.Common;
 
-namespace MessagesTests.Integration
+namespace ManagementTests.Integration
 {
-    public class CustomWebApplicationFactory: WebApplicationFactory<Program>
+    public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
@@ -17,7 +17,7 @@ namespace MessagesTests.Integration
 
             builder.ConfigureTestServices(services =>
             {
-                
+
                 services.RemoveAll(typeof(DbContextOptions<ManagementDbContext>));
                 services.RemoveAll(typeof(DbConnection));
 

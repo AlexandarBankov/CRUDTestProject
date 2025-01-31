@@ -17,7 +17,7 @@ namespace CRUDTestProject.Data.Repositories.Implementation
 
                 ZipFile.CreateFromDirectory(temp.FullName, Path.Combine(folderPath, name + ".zip"));
             }
-            finally 
+            finally
             {
                 temp.Delete(true);
             }

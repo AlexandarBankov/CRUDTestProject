@@ -3,7 +3,6 @@ using CRUDTestProject.Data.Entities;
 using CRUDTestProject.Models;
 using CRUDTestProject.Models.Response;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -67,7 +66,7 @@ namespace MessagesTests.Integration
                 context.RemoveRange(context.Messages);
                 context.AddRange(getMessages());
                 context.AddRange(getDeletedMessages());
-                context.AddRange([new BadWord() { Word = BADWORD}]);
+                context.AddRange([new BadWord() { Word = BADWORD }]);
                 context.SaveChanges();
 
                 ID = context.Messages.Where(m => m.Username == USERNAME && !m.IsDeleted).FirstOrDefault().Id;
@@ -127,7 +126,7 @@ namespace MessagesTests.Integration
 
         private string? GetToken(string username, bool isAdmin = false, bool isManagement = false)
         {
-            List<Claim> authClaims = new List<Claim>() { new Claim(ClaimTypes.Name, username), new Claim(ClaimTypes.Email, EMAIL) };
+            List<Claim> authClaims = [new Claim(ClaimTypes.Name, username), new Claim(ClaimTypes.Email, EMAIL)];
 
             if (isAdmin)
             {

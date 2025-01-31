@@ -1,6 +1,5 @@
 ﻿using Management.Data.Entities;
 using Management.Models;
-using MessagesTests.Integration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +9,7 @@ using System.Security.Claims;
 
 namespace ManagementTests.Integration
 {
-    public class ManagementApiIntegrationTests: IClassFixture<CustomWebApplicationFactory>
+    public class ManagementApiIntegrationTests : IClassFixture<CustomWebApplicationFactory>
     {
         const string USERNAME = "username";
         const string PASSWORD = "password";
@@ -31,7 +30,7 @@ namespace ManagementTests.Integration
                 {
                     _ = userManager.DeleteAsync(user).Result;
                 }
-                var toAdd = new User() { UserName = USERNAME, Email = "", TenantId = ""};
+                var toAdd = new User() { UserName = USERNAME, Email = "", TenantId = "" };
                 _ = userManager.CreateAsync(toAdd, PASSWORD).Result;
                 userCount = userManager.Users.Count();
             }
@@ -68,13 +67,11 @@ namespace ManagementTests.Integration
             var response = await client.PostAsJsonAsync("/management/user/create", toPost);
             response.EnsureSuccessStatusCode();
 
-            using (var scope = factory.Services.CreateScope())
-            {
-                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+            using var scope = factory.Services.CreateScope();
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
 
-                Assert.Equal(userCount + 1, userManager.Users.Count());
-                Assert.True(userManager.Users.Any(u => u.UserName == toPost.Username));
-            }
+            Assert.Equal(userCount + 1, userManager.Users.Count());
+            Assert.True(userManager.Users.Any(u => u.UserName == toPost.Username));
         }
 
         [Fact]

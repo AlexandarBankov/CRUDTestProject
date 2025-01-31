@@ -1,13 +1,13 @@
 using Management.Data;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
 using Management.Data.Entities;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Management.Middleware;
 using Management.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Refit;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +22,7 @@ var connectionString = builder.Configuration.GetConnectionString("default");
 builder.Services.AddDbContext<ManagementDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-builder.Services.AddIdentity<User, IdentityRole>(options => 
+builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
     options.SignIn.RequireConfirmedAccount = true;
     options.Password.RequireDigit = false;
@@ -61,7 +61,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services
-    .AddRefitClient<IMessagesApi>( new RefitSettings() { AuthorizationHeaderValueGetter = (rq, ct) => ApiTokenGenerator.GetTokenForMessages(configuration)} )
+    .AddRefitClient<IMessagesApi>(new RefitSettings() { AuthorizationHeaderValueGetter = (rq, ct) => ApiTokenGenerator.GetTokenForMessages(configuration) })
     .ConfigureHttpClient(c => c.BaseAddress = new Uri(configuration["MessagesApiLink"]));
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
