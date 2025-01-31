@@ -10,13 +10,13 @@ namespace MessagesTests.Controller
         public Guid ExistingId { get; private set; }
         public Guid MissingId { get; private set; }
 
-        public Message message { get; private set; }
+        public Message Message { get; private set; }
 
         public RepositoryFixture()
         {
             ExistingId = Guid.NewGuid();
             MissingId = Guid.NewGuid();
-            message = new() 
+            Message = new()
             {
                 Id = this.ExistingId,
                 Name = "string",
@@ -25,18 +25,18 @@ namespace MessagesTests.Controller
                 Email = "string",
                 CreationDate = DateTime.Now
             };
-            
+
             Mock = new();
-            Mock.Setup(repository => repository.GetById(ExistingId)).Returns(message);
-            
+            Mock.Setup(repository => repository.GetById(ExistingId)).Returns(Message);
+
             Message? m = null;
             Mock.Setup(repository => repository.GetById(MissingId)).Returns(m);
-            
+
             Mock.Setup(repository => repository.Insert(It.IsAny<Message>()));
 
             Mock.Setup(repository => repository.Delete(It.IsAny<Guid>(), It.IsAny<string>()));
-            
-            Mock.Setup(repository => repository.Update(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(message);
+
+            Mock.Setup(repository => repository.Update(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(Message);
         }
     }
 }

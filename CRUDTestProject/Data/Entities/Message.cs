@@ -9,7 +9,7 @@ namespace CRUDTestProject.Data.Entities
 
         [MaxLength(Constants.MessageNameMaxLength)]
         public required string Name { get; set; }
-        
+
         [MaxLength(Constants.MessageContentMaxLength)]
         public required string Content { get; set; }
         public required DateTime CreationDate { get; set; }
@@ -17,7 +17,7 @@ namespace CRUDTestProject.Data.Entities
         //Data of the poster
         [MaxLength(Constants.UsernameMaxLength)]
         public required string Username { get; set; }
-        
+
         [MaxLength(Constants.EmailMaxLength)]
         public required string Email { get; set; }
 

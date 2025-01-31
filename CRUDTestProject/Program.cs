@@ -1,9 +1,10 @@
-using Cronos;
 using CRUDTestProject.Data;
 using CRUDTestProject.Data.Repositories;
+using CRUDTestProject.Data.Repositories.Implementation;
 using CRUDTestProject.Middleware;
 using CRUDTestProject.Scheduling;
 using CRUDTestProject.Services;
+using CRUDTestProject.Services.Implementation;
 using EasyCronJob.Core;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -57,13 +58,22 @@ builder.Services.AddScoped<IBadWordsRepository, BadWordsRepository>();
 builder.Services.AddScoped<IBadWordsHandler, BadWordsHandler>();
 builder.Services.AddScoped<IBulkMessagesRepository, BulkMessagesRepository>();
 builder.Services.AddScoped<IBulkMessagesHandler, BulkMessagesHandler>();
+builder.Services.AddScoped<IBackupRepository, BackupRepository>();
+builder.Services.AddScoped<IBackupHandler, BackupHandler>();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
-builder.Services.ApplyResulation<RemoveOldSoftDeletedMessages>(options => 
+builder.Services.ApplyResulation<RemoveOldSoftDeletedMessages>(options =>
 {
     options.CronExpression = "0 2 * * *"; // every day at 02:00 AM
+    options.TimeZoneInfo = TimeZoneInfo.Local;
+    options.CronFormat = Cronos.CronFormat.Standard;
+});
+
+builder.Services.ApplyResulation<BackupMessagesDb>(options =>
+{
+    options.CronExpression = "0 4 1 */3 *"; // on the 1st day of the month every 3 months at 04:00 AM
     options.TimeZoneInfo = TimeZoneInfo.Local;
     options.CronFormat = Cronos.CronFormat.Standard;
 });

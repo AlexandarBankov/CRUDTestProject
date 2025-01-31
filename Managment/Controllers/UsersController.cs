@@ -15,15 +15,15 @@ namespace Management.Controllers
         [Route("user")]
         public async Task<IActionResult> LoginAsync([FromBody] LoginUserModel model)
         {
-            var token = await  userHandler.Authenticate(model);
+            var token = await userHandler.Authenticate(model);
             return Ok(new JwtSecurityTokenHandler().WriteToken(token));
         }
 
         [HttpGet]
         [Authorize]
-        public IActionResult Get() 
+        public IActionResult Get()
         {
-            
+
             return Ok(User.FindFirstValue(ClaimTypes.Name));
         }
 

@@ -3,7 +3,6 @@ using CRUDTestProject.Data.Entities;
 using CRUDTestProject.Models;
 using CRUDTestProject.Models.Response;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -67,7 +66,7 @@ namespace MessagesTests.Integration
                 context.RemoveRange(context.Messages);
                 context.AddRange(getMessages());
                 context.AddRange(getDeletedMessages());
-                context.AddRange([new BadWord() { Word = BADWORD}]);
+                context.AddRange([new BadWord() { Word = BADWORD }]);
                 context.SaveChanges();
 
                 ID = context.Messages.Where(m => m.Username == USERNAME && !m.IsDeleted).FirstOrDefault().Id;
@@ -127,7 +126,7 @@ namespace MessagesTests.Integration
 
         private string? GetToken(string username, bool isAdmin = false, bool isManagement = false)
         {
-            List<Claim> authClaims = new List<Claim>() { new Claim(ClaimTypes.Name, username), new Claim(ClaimTypes.Email, EMAIL) };
+            List<Claim> authClaims = [new Claim(ClaimTypes.Name, username), new Claim(ClaimTypes.Email, EMAIL)];
 
             if (isAdmin)
             {
@@ -322,7 +321,7 @@ namespace MessagesTests.Integration
         public async Task AddBadWordWhenNotAdmin()
         {
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GetToken(USERNAME));
-            var response = await client.PostAsJsonAsync("/api/BadWords", new List<string>() { ""});
+            var response = await client.PostAsJsonAsync("/api/Admin/AddBadWords", new List<string>() { "" });
 
             Assert.Equal(StatusCodes.Status403Forbidden, ((int)response.StatusCode));
         }
@@ -331,7 +330,7 @@ namespace MessagesTests.Integration
         public async Task AddBadWordWhenAdmin()
         {
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GetToken(USERNAME, true));
-            var response = await client.PostAsJsonAsync("/api/BadWords", new List<string>() { "" });
+            var response = await client.PostAsJsonAsync("/api/Admin/AddBadWords", new List<string>() { "" });
 
             response.EnsureSuccessStatusCode();
         }
@@ -340,7 +339,7 @@ namespace MessagesTests.Integration
         public async Task RemoveBadWordWhenNotAdmin()
         {
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GetToken(USERNAME));
-            var response = await client.DeleteAsync("/api/BadWords?badWord=" + BADWORD);
+            var response = await client.DeleteAsync("/api/Admin/RemoveBadWord?badWord=" + BADWORD);
 
             Assert.Equal(StatusCodes.Status403Forbidden, ((int)response.StatusCode));
         }
@@ -349,7 +348,7 @@ namespace MessagesTests.Integration
         public async Task RemoveExistingBadWordWhenAdmin()
         {
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GetToken(USERNAME, true));
-            var response = await client.DeleteAsync("/api/BadWords?badWord=" + BADWORD);
+            var response = await client.DeleteAsync("/api/Admin/RemoveBadWord?badWord=" + BADWORD);
 
             response.EnsureSuccessStatusCode();
         }

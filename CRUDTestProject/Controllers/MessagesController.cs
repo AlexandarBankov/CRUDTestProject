@@ -89,7 +89,7 @@ namespace CRUDTestProject.Controllers
         {
             messageHandler.Delete(id, username);
 
-            return Ok();
+            return NoContent();
         }
 
         [HttpPatch]

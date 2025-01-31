@@ -2,12 +2,8 @@
 using CRUDTestProject.Data.Repositories;
 using CRUDTestProject.Middleware.Exceptions;
 using CRUDTestProject.Services;
+using CRUDTestProject.Services.Implementation;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MessagesTests.Services
 {
@@ -20,7 +16,7 @@ namespace MessagesTests.Services
         private readonly string MISSING = Guid.NewGuid().ToString();
         public BadWordsHandlerTests()
         {
-            badWords = [new() { Word = BADWORD}];
+            badWords = [new() { Word = BADWORD }];
             mockRepository = new();
 
             mockRepository.Setup(m => m.BadWords).Returns(badWords);
@@ -29,7 +25,7 @@ namespace MessagesTests.Services
         }
 
         [Fact]
-        public void CheckForBadWordsShouldThrowOnBadWord() 
+        public void CheckForBadWordsShouldThrowOnBadWord()
         {
             Assert.Throws<BadWordException>(() => handler.CheckForBadWords([BADWORD]));
         }

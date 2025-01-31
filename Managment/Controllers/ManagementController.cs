@@ -25,7 +25,7 @@ namespace Management.Controllers
         {
             await userHandler.Ban(username, removeMessages);
 
-            return Ok();
+            return NoContent();
         }
     }
 }

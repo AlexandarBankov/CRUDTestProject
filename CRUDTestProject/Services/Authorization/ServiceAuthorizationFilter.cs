@@ -4,14 +4,9 @@ using SharedLibrary;
 
 namespace CRUDTestProject.Services.Authorization
 {
-    public class ServiceAuthorizationFilter : IAuthorizationFilter
+    public class ServiceAuthorizationFilter(IEnumerable<string> acceptAnyOf) : IAuthorizationFilter
     {
-        private readonly IEnumerable<string> claimValues;
-
-        public ServiceAuthorizationFilter(IEnumerable<string> acceptAnyOf)
-        {
-            claimValues = acceptAnyOf;
-        }
+        private readonly IEnumerable<string> claimValues = acceptAnyOf;
 
         public void OnAuthorization(AuthorizationFilterContext context)
         {

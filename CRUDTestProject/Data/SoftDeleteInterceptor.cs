@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Diagnostics;
+﻿using CRUDTestProject.Data.Entities;
 using Microsoft.EntityFrameworkCore;
-using CRUDTestProject.Data.Entities;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace CRUDTestProject.Data
 {

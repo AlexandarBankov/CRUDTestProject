@@ -9,7 +9,7 @@ using System.Data.Common;
 
 namespace MessagesTests.Integration
 {
-    public class CustomWebApplicationFactory: WebApplicationFactory<Program>
+    public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
@@ -17,11 +17,11 @@ namespace MessagesTests.Integration
 
             builder.ConfigureTestServices(services =>
             {
-                
+
                 services.RemoveAll(typeof(DbContextOptions<ApplicationDbContext>));
                 services.RemoveAll(typeof(DbConnection));
 
-                services.AddDbContext<ApplicationDbContext>((sp,options) =>
+                services.AddDbContext<ApplicationDbContext>((sp, options) =>
                     options.UseInMemoryDatabase("TestDb")
                     .AddInterceptors(sp.GetRequiredService<SoftDeleteInterceptor>()));
             });

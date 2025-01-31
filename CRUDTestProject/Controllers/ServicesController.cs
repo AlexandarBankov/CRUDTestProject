@@ -24,7 +24,7 @@ namespace CRUDTestProject.Controllers
         public IActionResult DeleteUserMessages(string username)
         {
             handler.DeleteUserMessages(username);
-            return Ok();
+            return NoContent();
         }
     }
 }

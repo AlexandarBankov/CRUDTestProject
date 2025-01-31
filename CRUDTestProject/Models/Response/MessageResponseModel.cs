@@ -1,5 +1,4 @@
 ﻿using CRUDTestProject.Data.Entities;
-using System.Text.Json.Serialization;
 
 namespace CRUDTestProject.Models.Response
 {
@@ -7,7 +6,7 @@ namespace CRUDTestProject.Models.Response
     {
         public MessageResponseModel()
         {
-            
+
         }
         public MessageResponseModel(Message message)
         {
@@ -17,13 +16,13 @@ namespace CRUDTestProject.Models.Response
             this.CreationDate = message.CreationDate;
             this.Username = message.Username;
         }
-        public Guid Id { get; set; } 
-        public string Name { get; set; } 
-        public string Content { get; set; } 
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public string Content { get; set; }
 
-        public DateTime CreationDate { get; set; } 
+        public DateTime CreationDate { get; set; }
 
         //Data of the poster
-        public string Username { get; set; } 
+        public string Username { get; set; }
     }
 }

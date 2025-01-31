@@ -17,20 +17,20 @@ namespace ManagementTests.Services
         const string DELETABLE_USERNAME = "DELETABLE_USERNAME";
         const string PASSWORD = "password";
         private readonly string JWTSECRET = Guid.NewGuid().ToString() + Guid.NewGuid().ToString();
-        
+
         private User deletableUser = new User() { TenantId = "", Email = "", UserName = DELETABLE_USERNAME, Id = "" };
-        
+
         private readonly IUserHandler userHandler;
         private Mock<UserManager<User>> mockManager;
         private Mock<IMessagesApi> mockApi;
-        
+
 
         public UserHandlerTests()
         {
             mockApi = new();
             mockManager = new(Mock.Of<IUserStore<User>>(), null, null, null, null, null, null, null, null);
             var user = new User() { TenantId = "", Email = "", UserName = USERNAME };
-            
+
 
             mockManager.Setup(m => m.FindByNameAsync(USERNAME)).ReturnsAsync(user);
             mockManager.Setup(m => m.FindByNameAsync(DELETABLE_USERNAME)).ReturnsAsync(deletableUser);
@@ -40,7 +40,7 @@ namespace ManagementTests.Services
             mockManager.Setup(m => m.GetRolesAsync(user)).ReturnsAsync(["Admin"]);
 
             mockManager.Setup(m => m.CreateAsync(It.IsAny<User>(), It.IsAny<string>())).ReturnsAsync(IdentityResult.Success);
-            
+
             Mock<IConfiguration> mockConfig = new();
             mockConfig.Setup(c => c["JWT:Secret"]).Returns(JWTSECRET);
             mockConfig.Setup(c => c["JWT:Issuer"]).Returns("");
@@ -79,7 +79,7 @@ namespace ManagementTests.Services
         [Fact]
         public async Task CreateUserWithExistingUsername()
         {
-            await Assert.ThrowsAsync<UserAlreadyExistsException>(() => userHandler.Create(new RegisterUserModel() { Username = USERNAME , Password = PASSWORD, Email = "", TenantId = ""}));
+            await Assert.ThrowsAsync<UserAlreadyExistsException>(() => userHandler.Create(new RegisterUserModel() { Username = USERNAME, Password = PASSWORD, Email = "", TenantId = "" }));
         }
 
         [Fact]
