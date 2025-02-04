@@ -1,0 +1,27 @@
+services:
+  crudtestproject:
+    image: ${DOCKER_REGISTRY-}crudtestproject
+    ports:
+        -  7002,8081
+    build:
+      context: .
+      dockerfile: CRUDTestProject/Dockerfile
+    depends_on:
+        - SqlServerDb
+  management:
+    image: ${DOCKER_REGISTRY-}management
+    ports:
+        -  7143,8081
+    build:
+      context: .
+      dockerfile: CRUDTestProject/Dockerfile
+    depends_on:
+        - SqlServerDb
+  SqlServerDb:
+    container_name: SqlServerContainer
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports:
+        - 8002:1433
+    environment:
+        - ACCEPT_EULA=Y
+        - MSSQL_SA_PASSWORD=myStong_Password123# 
