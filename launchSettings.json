@@ -4,7 +4,9 @@
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
       "serviceActions": {
-        "crudtestproject": "StartDebugging"
+        "crudtestproject": "StartDebugging",
+        "management": "StartDebugging",
+        "SqlServerDb": "StartWithoutDebugging"
       }
     }
   }

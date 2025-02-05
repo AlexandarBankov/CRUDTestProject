@@ -2,7 +2,7 @@ services:
   crudtestproject:
     image: ${DOCKER_REGISTRY-}crudtestproject
     ports:
-        -  7002,8081
+        -  7002:8081
     build:
       context: .
       dockerfile: CRUDTestProject/Dockerfile
@@ -11,10 +11,10 @@ services:
   management:
     image: ${DOCKER_REGISTRY-}management
     ports:
-        -  7143,8081
+        -  7143:8081
     build:
       context: .
-      dockerfile: CRUDTestProject/Dockerfile
+      dockerfile: Managment/Dockerfile
     depends_on:
         - SqlServerDb
   SqlServerDb:
